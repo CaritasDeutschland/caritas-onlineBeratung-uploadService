@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.12.0](https://github.com/virtualidentityag/caritas-onlineBeratung-uploadService/compare/v1.11.0...v1.12.0) (2022-07-11)
+
+
+### Features
+
+* [VIC-795] added fork auto sync config ([2a269f7](https://github.com/virtualidentityag/caritas-onlineBeratung-uploadService/commit/2a269f75be7e19709018a354802cd8e6eb790d1b))
+* upgrade keycloak to the latest version ([3bd6b8b](https://github.com/virtualidentityag/caritas-onlineBeratung-uploadService/commit/3bd6b8bb21970daa6278aead0a68cd7596411303))
+
+
+### Bug Fixes
+
+* fixing method order to make sure tenant header is added ([22e870e](https://github.com/virtualidentityag/caritas-onlineBeratung-uploadService/commit/22e870e6466204905fb7b4f65182a8f4919efe57))
+* fixing tenant id Async operation issue ([6b1a2b5](https://github.com/virtualidentityag/caritas-onlineBeratung-uploadService/commit/6b1a2b5170bf68e0ab8e34e47183bc033ddc9099))
+* pass tenant context also for live events ([e75198f](https://github.com/virtualidentityag/caritas-onlineBeratung-uploadService/commit/e75198f0fa703efc4beece1b5ea293c73ae5a29b))
+* review comments ([fed1add](https://github.com/virtualidentityag/caritas-onlineBeratung-uploadService/commit/fed1add0e6087348eecb8bc2d7aaf04607c4800a))
+* switch to usercontroller api call instead of resttemplate.exchange ([574c212](https://github.com/virtualidentityag/caritas-onlineBeratung-uploadService/commit/574c21282f582c56aa967d22a14839890df1b4fd))
+* switch to usercontroller api call instead of resttemplate.exchange ([2ae61c5](https://github.com/virtualidentityag/caritas-onlineBeratung-uploadService/commit/2ae61c51112c5d2268ced3dc67804427deb41929))
+* switch to usercontroller api call instead of resttemplate.exchange, adapting tests ([ff92e82](https://github.com/virtualidentityag/caritas-onlineBeratung-uploadService/commit/ff92e82d4efd1d1b52380a9f3d7d7fe436bc1726))
+* switch to usercontroller api call instead of resttemplate.exchange, adapting tests ([bcb7263](https://github.com/virtualidentityag/caritas-onlineBeratung-uploadService/commit/bcb72632796aef9ea50f2a6fbf0b03baff2fd34f))
+
 ## [1.11.0](https://github.com/virtualidentityag/caritas-onlineBeratung-uploadService/compare/v1.10.0...v1.11.0) (2022-03-14)
 
 
