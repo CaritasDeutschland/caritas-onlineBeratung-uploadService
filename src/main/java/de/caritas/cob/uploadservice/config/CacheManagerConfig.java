@@ -1,10 +1,12 @@
 package de.caritas.cob.uploadservice.config;
 
+import java.util.Collection;
+import java.util.List;
 import net.sf.ehcache.config.CacheConfiguration;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cache.ehcache.EhCacheCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -48,5 +50,18 @@ public class CacheManagerConfig {
     return tenantCacheConfiguration;
   }
 
+  private class EhCacheCacheManager implements CacheManager {
 
+    public EhCacheCacheManager(net.sf.ehcache.CacheManager cacheManager) {}
+
+    @Override
+    public Cache getCache(String name) {
+      return null;
+    }
+
+    @Override
+    public Collection<String> getCacheNames() {
+      return List.of();
+    }
+  }
 }

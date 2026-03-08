@@ -11,9 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-/**
- * Service to track uploaded files per user and validate against configurated limit.
- */
+/** Service to track uploaded files per user and validate against configurated limit. */
 @Service
 @RequiredArgsConstructor
 public class UploadTrackingService {
@@ -32,8 +30,8 @@ public class UploadTrackingService {
    */
   public void validateUploadLimit(String sessionId) {
     String userId = this.authenticatedUser.getUserId();
-    Integer uploadCount = this.uploadByUserRepository
-        .countAllByUserIdAndSessionId(userId, sessionId);
+    Integer uploadCount =
+        this.uploadByUserRepository.countAllByUserIdAndSessionId(userId, sessionId);
     if (uploadCount >= this.uploadLimit) {
       throw new QuotaReachedException(LogService::logInfo);
     }
@@ -46,11 +44,12 @@ public class UploadTrackingService {
    */
   public void trackUploadedFileForUser(String sessionId) {
     String userId = this.authenticatedUser.getUserId();
-    UploadByUser uploadByUser = UploadByUser.builder()
-        .userId(userId)
-        .sessionId(sessionId)
-        .createDate(LocalDateTime.now())
-        .build();
+    UploadByUser uploadByUser =
+        UploadByUser.builder()
+            .userId(userId)
+            .sessionId(sessionId)
+            .createDate(LocalDateTime.now())
+            .build();
 
     this.uploadByUserRepository.save(uploadByUser);
   }
@@ -64,5 +63,4 @@ public class UploadTrackingService {
     this.uploadByUserRepository.deleteAll();
     LogService.logInfo("File restrictions are reset!");
   }
-
 }

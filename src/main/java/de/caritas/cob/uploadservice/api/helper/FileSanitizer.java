@@ -3,7 +3,7 @@ package de.caritas.cob.uploadservice.api.helper;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 
 public class FileSanitizer {
 
@@ -22,7 +22,7 @@ public class FileSanitizer {
    */
   public static String sanitizeFileName(String fileName) {
 
-    if (StringUtils.isEmpty(FilenameUtils.getExtension(fileName))) {
+    if (ObjectUtils.isEmpty(FilenameUtils.getExtension(fileName))) {
       return null;
     }
 
@@ -37,7 +37,9 @@ public class FileSanitizer {
 
   private static String removeSpecialChars(final String fileName) {
 
-    return fileName.trim().replaceAll(REGEX_REMOVE_ALL_DOTS_EXCEPT_LAST, "")
+    return fileName
+        .trim()
+        .replaceAll(REGEX_REMOVE_ALL_DOTS_EXCEPT_LAST, "")
         .replaceAll(REGEX_REMOVE_NOT_ALLOWED_SPECIAL_CHARS, "");
   }
 
@@ -46,9 +48,12 @@ public class FileSanitizer {
     final String extension = "." + FilenameUtils.getExtension(fileName);
     final String fileNameWithoutExtension = fileNameWithoutExtension(fileName);
 
-    return fileNameWithoutExtension.substring(0,
-        fileName.length() > MAX_FILE_NAME_LENGTH ? MAX_FILE_NAME_LENGTH - extension.length()
-            : fileNameWithoutExtension.length()) + extension;
+    return fileNameWithoutExtension.substring(
+            0,
+            fileName.length() > MAX_FILE_NAME_LENGTH
+                ? MAX_FILE_NAME_LENGTH - extension.length()
+                : fileNameWithoutExtension.length())
+        + extension;
   }
 
   private static boolean isFileNameEmpty(String fileName) {
@@ -56,10 +61,9 @@ public class FileSanitizer {
   }
 
   private static String fileNameWithoutExtension(String fileName) {
-    return fileName
-        .substring(0, fileName.length() - (FilenameUtils.getExtension(fileName).length() + 1));
+    return fileName.substring(
+        0, fileName.length() - (FilenameUtils.getExtension(fileName).length() + 1));
   }
 
-  private FileSanitizer() {
-  }
+  private FileSanitizer() {}
 }

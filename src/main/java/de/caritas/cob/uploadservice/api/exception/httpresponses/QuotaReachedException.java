@@ -2,9 +2,7 @@ package de.caritas.cob.uploadservice.api.exception.httpresponses;
 
 import java.util.function.Consumer;
 
-/**
- * Custom exception to provide 403 - forbidden with custom quota header information.
- */
+/** Custom exception to provide 403 - forbidden with custom quota header information. */
 public class QuotaReachedException extends CustomHttpStatusException {
 
   /**
@@ -15,5 +13,4 @@ public class QuotaReachedException extends CustomHttpStatusException {
   public QuotaReachedException(Consumer<Exception> loggingMethod) {
     super(loggingMethod);
   }
-
 }

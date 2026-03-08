@@ -15,7 +15,7 @@ public class JsonStringToObjectConverter<T> {
    * Convert a JSON string to an object.
    *
    * @param jsonAsString JSON as String
-   * @param classType    Class type
+   * @param classType Class type
    * @return if success, instance of classType or null, otherwise null
    */
   public T convert(String jsonAsString, Class<T> classType) {
@@ -24,8 +24,8 @@ public class JsonStringToObjectConverter<T> {
       return objectMapper.readValue(jsonAsString, classType);
     } catch (IOException | NullPointerException exception) {
       LogService.logInternalServerError(
-          String.format(
-              "Error while converting JSON string to generic object type %s", classType.toString()),
+          "Error while converting JSON string to generic object type %s"
+              .formatted(classType.toString()),
           exception);
       return null;
     }

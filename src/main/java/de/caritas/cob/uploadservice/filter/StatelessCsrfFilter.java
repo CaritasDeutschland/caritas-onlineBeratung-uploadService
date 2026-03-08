@@ -1,16 +1,16 @@
 package de.caritas.cob.uploadservice.filter;
 
-import static de.caritas.cob.uploadservice.config.SpringFoxConfig.WHITE_LIST;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
+import de.caritas.cob.uploadservice.config.SecurityConfig;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.regex.Pattern;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
@@ -19,9 +19,7 @@ import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-/**
- * This custom filter checks CSRF cookie and header token for equality
- */
+/** This custom filter checks CSRF cookie and header token for equality */
 public class StatelessCsrfFilter extends OncePerRequestFilter {
 
   private final RequestMatcher requireCsrfProtectionMatcher;
@@ -29,8 +27,8 @@ public class StatelessCsrfFilter extends OncePerRequestFilter {
   private final String csrfCookieProperty;
   private final String csrfHeaderProperty;
 
-  public StatelessCsrfFilter(String cookieProperty, String headerProperty,
-      String csrfWhitelistHeaderProperty) {
+  public StatelessCsrfFilter(
+      String cookieProperty, String headerProperty, String csrfWhitelistHeaderProperty) {
     this.csrfCookieProperty = cookieProperty;
     this.csrfHeaderProperty = headerProperty;
     this.requireCsrfProtectionMatcher = new DefaultRequiresCsrfMatcher(csrfWhitelistHeaderProperty);
@@ -75,7 +73,7 @@ public class StatelessCsrfFilter extends OncePerRequestFilter {
     }
 
     private boolean isWhiteListUrl(HttpServletRequest request) {
-      return Arrays.asList(WHITE_LIST).parallelStream()
+      return Arrays.asList(SecurityConfig.WHITE_LIST).parallelStream()
           .anyMatch(request.getRequestURI().toLowerCase()::contains);
     }
 

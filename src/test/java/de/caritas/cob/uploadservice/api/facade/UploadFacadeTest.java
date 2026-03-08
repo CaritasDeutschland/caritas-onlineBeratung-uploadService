@@ -3,6 +3,7 @@ package de.caritas.cob.uploadservice.api.facade;
 import static de.caritas.cob.uploadservice.helper.TestConstants.CONSULTANT_ID;
 import static de.caritas.cob.uploadservice.helper.TestConstants.RC_ROOM_ID;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -31,64 +32,49 @@ import de.caritas.cob.uploadservice.api.statistics.event.CreateMessageStatistics
 import java.util.Objects;
 import org.apache.commons.collections4.SetUtils;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class UploadFacadeTest {
 
-  @InjectMocks
-  UploadFacade uploadFacade;
+  @InjectMocks UploadFacade uploadFacade;
 
-  @Mock
-  RocketChatService rocketChatService;
+  @Mock RocketChatService rocketChatService;
 
-  @Mock
-  EmailNotificationFacade emailNotificationFacade;
+  @Mock EmailNotificationFacade emailNotificationFacade;
 
-  @Mock
-  RocketChatUploadParameterSanitizer rocketChatUploadParameterSanitizer;
+  @Mock RocketChatUploadParameterSanitizer rocketChatUploadParameterSanitizer;
 
-  @Mock
-  RocketChatUploadParameterEncrypter rocketChatUploadParameterEncrypter;
+  @Mock RocketChatUploadParameterEncrypter rocketChatUploadParameterEncrypter;
 
-  @Mock
-  private LiveEventNotificationService liveEventNotificationService;
+  @Mock private LiveEventNotificationService liveEventNotificationService;
 
-  @Mock
-  RocketChatCredentials rocketChatCredentials;
+  @Mock RocketChatCredentials rocketChatCredentials;
 
-  @Mock
-  RocketChatUploadParameter rocketChatUploadParameter;
+  @Mock RocketChatUploadParameter rocketChatUploadParameter;
 
-  @Mock
-  private UploadTrackingService uploadTrackingService;
+  @Mock private UploadTrackingService uploadTrackingService;
 
-  @Mock
-  private StatisticsService statisticsService;
+  @Mock private StatisticsService statisticsService;
 
-  @Mock
-  private AuthenticatedUser authenticatedUser;
+  @Mock private AuthenticatedUser authenticatedUser;
 
-  @Mock
-  private FileService fileService;
+  @Mock private FileService fileService;
 
-  @Mock
-  private MongoDbService mongoDbService;
+  @Mock private MongoDbService mongoDbService;
 
   private TestMultipartFile multipartFile;
 
-  /**
-   * Method: uploadFileToRoom
-   */
-  @Before
+  /** Method: uploadFileToRoom */
+  @BeforeEach
   public void setup() throws CustomCryptoException {
     when(rocketChatUploadParameter.getRoomId()).thenReturn(RC_ROOM_ID);
     when(rocketChatUploadParameterSanitizer.sanitize(rocketChatUploadParameter))
@@ -99,22 +85,22 @@ public class UploadFacadeTest {
     when(rocketChatUploadParameter.getFile()).thenReturn(multipartFile);
     when(authenticatedUser.getRoles())
         .thenReturn(SetUtils.unmodifiableSet(UserRole.CONSULTANT.getValue()));
-    when(authenticatedUser.getUserId())
-        .thenReturn(CONSULTANT_ID);
+    when(authenticatedUser.getUserId()).thenReturn(CONSULTANT_ID);
   }
 
   @Test
   public void uploadFileToRoom_Should_UseServicesCorrectly_WhenNoExceptionIsThrown()
       throws Exception {
 
-    uploadFacade.uploadFileToRoom(rocketChatCredentials, rocketChatUploadParameter, false, null, null);
+    uploadFacade.uploadFileToRoom(
+        rocketChatCredentials, rocketChatUploadParameter, false, null, null);
 
     verify(rocketChatUploadParameterSanitizer, times(1)).sanitize(rocketChatUploadParameter);
     verify(rocketChatUploadParameterEncrypter, times(1)).encrypt(rocketChatUploadParameter);
-    verify(rocketChatService, times(1)).roomsUpload(rocketChatCredentials,
-        rocketChatUploadParameter);
-    verify(rocketChatService, times(1)).markGroupAsReadForSystemUser(
-        rocketChatUploadParameter.getRoomId());
+    verify(rocketChatService, times(1))
+        .roomsUpload(rocketChatCredentials, rocketChatUploadParameter);
+    verify(rocketChatService, times(1))
+        .markGroupAsReadForSystemUser(rocketChatUploadParameter.getRoomId());
     verify(uploadTrackingService, times(1)).validateUploadLimit(any());
     verify(uploadTrackingService, times(1)).trackUploadedFileForUser(any());
     verify(fileService).verifyMimeType(multipartFile);
@@ -123,7 +109,8 @@ public class UploadFacadeTest {
   @Test
   public void uploadFileToRoom_Should_sendEmailNotification_WhenParamIsTrue() {
 
-    uploadFacade.uploadFileToRoom(rocketChatCredentials, rocketChatUploadParameter, true, null, null);
+    uploadFacade.uploadFileToRoom(
+        rocketChatCredentials, rocketChatUploadParameter, true, null, null);
 
     verify(emailNotificationFacade, times(1)).sendEmailNotification(RC_ROOM_ID);
   }
@@ -131,31 +118,34 @@ public class UploadFacadeTest {
   @Test
   public void uploadFileToRoom_Should_FireUploadFileStatisticsEvent() {
 
-    uploadFacade.uploadFileToRoom(rocketChatCredentials, rocketChatUploadParameter, true, null, null);
+    uploadFacade.uploadFileToRoom(
+        rocketChatCredentials, rocketChatUploadParameter, true, null, null);
 
-    verify(statisticsService, times(1))
-        .fireEvent(any(CreateMessageStatisticsEvent.class));
+    verify(statisticsService, times(1)).fireEvent(any(CreateMessageStatisticsEvent.class));
 
-    ArgumentCaptor<CreateMessageStatisticsEvent> captor = ArgumentCaptor.forClass(
-        CreateMessageStatisticsEvent.class);
+    ArgumentCaptor<CreateMessageStatisticsEvent> captor =
+        ArgumentCaptor.forClass(CreateMessageStatisticsEvent.class);
     verify(statisticsService, times(1)).fireEvent(captor.capture());
-    String userId = Objects.requireNonNull(
-        ReflectionTestUtils.getField(captor.getValue(), "userId")).toString();
+    String userId =
+        Objects.requireNonNull(ReflectionTestUtils.getField(captor.getValue(), "userId"))
+            .toString();
     assertThat(userId, Matchers.is(CONSULTANT_ID));
-    String userRole = Objects.requireNonNull(
-        ReflectionTestUtils.getField(captor.getValue(), "userRole")).toString();
+    String userRole =
+        Objects.requireNonNull(ReflectionTestUtils.getField(captor.getValue(), "userRole"))
+            .toString();
     assertThat(userRole, Matchers.is(UserRole.CONSULTANT.toString()));
-    String rcGroupId = Objects.requireNonNull(
-        ReflectionTestUtils.getField(captor.getValue(), "rcGroupId")).toString();
+    String rcGroupId =
+        Objects.requireNonNull(ReflectionTestUtils.getField(captor.getValue(), "rcGroupId"))
+            .toString();
     assertThat(rcGroupId, Matchers.is(RC_ROOM_ID));
-
   }
 
   @Test
   public void uploadFileToRoom_Should_markGroupAsReadForSystemUser()
       throws RocketChatPostMarkGroupAsReadException {
 
-    uploadFacade.uploadFileToRoom(rocketChatCredentials, rocketChatUploadParameter, false, null, null);
+    uploadFacade.uploadFileToRoom(
+        rocketChatCredentials, rocketChatUploadParameter, false, null, null);
 
     verify(rocketChatService, times(1)).markGroupAsReadForSystemUser(RC_ROOM_ID);
   }
@@ -163,7 +153,8 @@ public class UploadFacadeTest {
   @Test
   public void uploadFileToRoom_Should_uploadToRocketChat() {
 
-    uploadFacade.uploadFileToRoom(rocketChatCredentials, rocketChatUploadParameter, false, null, null);
+    uploadFacade.uploadFileToRoom(
+        rocketChatCredentials, rocketChatUploadParameter, false, null, null);
 
     verify(rocketChatService, times(1))
         .roomsUpload(
@@ -173,7 +164,8 @@ public class UploadFacadeTest {
   @Test
   public void uploadFileToRoom_Should_EncryptRocketChatParameters() throws CustomCryptoException {
 
-    uploadFacade.uploadFileToRoom(rocketChatCredentials, rocketChatUploadParameter, false, null, null);
+    uploadFacade.uploadFileToRoom(
+        rocketChatCredentials, rocketChatUploadParameter, false, null, null);
 
     verify(rocketChatUploadParameterEncrypter, times(1)).encrypt(rocketChatUploadParameter);
   }
@@ -181,7 +173,8 @@ public class UploadFacadeTest {
   @Test
   public void uploadFileToRoom_Should_SanitizeRocketChatParameter() {
 
-    uploadFacade.uploadFileToRoom(rocketChatCredentials, rocketChatUploadParameter, false, null, null);
+    uploadFacade.uploadFileToRoom(
+        rocketChatCredentials, rocketChatUploadParameter, false, null, null);
 
     verify(rocketChatUploadParameterSanitizer, times(1)).sanitize(rocketChatUploadParameter);
   }
@@ -189,35 +182,43 @@ public class UploadFacadeTest {
   @Test
   public void uploadFileToRoom_Should_sendLiveNotification_When_UploadSucceeds() {
 
-    uploadFacade.uploadFileToRoom(rocketChatCredentials, rocketChatUploadParameter, false, null, null);
+    uploadFacade.uploadFileToRoom(
+        rocketChatCredentials, rocketChatUploadParameter, false, null, null);
 
     verify(this.liveEventNotificationService, times(1))
         .sendLiveEvent(eq(rocketChatUploadParameter.getRoomId()), any(), any());
   }
 
-  @Test(expected = InternalServerErrorException.class)
-  public void uploadFileToRoom_Should_ThrowInternalServerErrorException_WhenCustomCryptoExceptionIsThrown()
-      throws Exception {
+  @Test
+  public void
+      uploadFileToRoom_Should_ThrowInternalServerErrorException_WhenCustomCryptoExceptionIsThrown() {
+    assertThrows(
+        InternalServerErrorException.class,
+        () -> {
+          when(rocketChatUploadParameterEncrypter.encrypt(any()))
+              .thenThrow(mock(CustomCryptoException.class));
 
-    when(rocketChatUploadParameterEncrypter.encrypt(any()))
-        .thenThrow(mock(CustomCryptoException.class));
-
-    uploadFacade.uploadFileToRoom(rocketChatCredentials, rocketChatUploadParameter, false, null, null);
+          uploadFacade.uploadFileToRoom(
+              rocketChatCredentials, rocketChatUploadParameter, false, null, null);
+        });
   }
 
-  @Test(expected = InternalServerErrorException.class)
-  public void uploadFileToRoom_Should_ThrowInternalServerErrorException_WheRocketChatPostMarkGroupAsReadExceptionIsThrown()
-      throws Exception {
+  @Test
+  public void
+      uploadFileToRoom_Should_ThrowInternalServerErrorException_WheRocketChatPostMarkGroupAsReadExceptionIsThrown() {
+    assertThrows(
+        InternalServerErrorException.class,
+        () -> {
+          doThrow(mock(RocketChatPostMarkGroupAsReadException.class))
+              .when(rocketChatService)
+              .markGroupAsReadForSystemUser(anyString());
 
-    doThrow(mock(RocketChatPostMarkGroupAsReadException.class)).when(rocketChatService)
-        .markGroupAsReadForSystemUser(anyString());
-
-    uploadFacade.uploadFileToRoom(rocketChatCredentials, rocketChatUploadParameter, false, null, null);
+          uploadFacade.uploadFileToRoom(
+              rocketChatCredentials, rocketChatUploadParameter, false, null, null);
+        });
   }
 
-  /**
-   * Method: uploadFileToFeedbackRoom
-   */
+  /** Method: uploadFileToFeedbackRoom */
   @Test
   public void uploadFileToFeedbackRoom_Should_CallServicesCorrectly_WhenNoExceptionIsThrown()
       throws Exception {
@@ -227,10 +228,10 @@ public class UploadFacadeTest {
 
     verify(rocketChatUploadParameterSanitizer, times(1)).sanitize(rocketChatUploadParameter);
     verify(rocketChatUploadParameterEncrypter, times(1)).encrypt(rocketChatUploadParameter);
-    verify(rocketChatService, times(1)).roomsUpload(rocketChatCredentials,
-        rocketChatUploadParameter);
-    verify(rocketChatService, times(1)).markGroupAsReadForSystemUser(
-        rocketChatUploadParameter.getRoomId());
+    verify(rocketChatService, times(1))
+        .roomsUpload(rocketChatCredentials, rocketChatUploadParameter);
+    verify(rocketChatService, times(1))
+        .markGroupAsReadForSystemUser(rocketChatUploadParameter.getRoomId());
     verify(uploadTrackingService, times(1)).validateUploadLimit(any());
     verify(uploadTrackingService, times(1)).trackUploadedFileForUser(any());
     verify(fileService).verifyMimeType(multipartFile);
@@ -288,7 +289,8 @@ public class UploadFacadeTest {
   @Test
   public void uploadFileToFeedbackRoom_Should_sendLiveNotification_When_UploadSucceeds() {
 
-    uploadFacade.uploadFileToFeedbackRoom(rocketChatCredentials, rocketChatUploadParameter, false, null, null);
+    uploadFacade.uploadFileToFeedbackRoom(
+        rocketChatCredentials, rocketChatUploadParameter, false, null, null);
 
     verify(this.liveEventNotificationService, times(1))
         .sendLiveEvent(eq(rocketChatUploadParameter.getRoomId()), any(), any());

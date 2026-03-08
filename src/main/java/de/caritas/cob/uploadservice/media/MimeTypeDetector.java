@@ -6,5 +6,4 @@ import java.util.Optional;
 public interface MimeTypeDetector {
 
   Optional<String> detect(InputStream input);
-
 }

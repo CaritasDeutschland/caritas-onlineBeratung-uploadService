@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileService {
 
   private final MimeTypeDetector mimeTypeDetector;
+
   @Value("#{${mime-type-whitelist}}")
   private final Set<String> mimeTypeWhitelist;
 
@@ -31,7 +32,8 @@ public class FileService {
       mimeType = mimeTypeDetector.detect(multipartFile.getInputStream());
     } catch (Exception e) {
       throw new InternalServerErrorException(
-          "failed to detect mime type of file " + multipartFile.getOriginalFilename(), e,
+          "failed to detect mime type of file " + multipartFile.getOriginalFilename(),
+          e,
           LogService::logInternalServerError);
     }
     if (mimeType.isEmpty() || !mimeTypeWhitelist.contains(mimeType.get())) {
@@ -50,7 +52,8 @@ public class FileService {
       mimeType = mimeTypeDetector.detect(fileHeaderInputStream);
     } catch (Exception e) {
       throw new InternalServerErrorException(
-          "failed to detect mime type of fileHeader " + fileHeaderInputStream, e,
+          "failed to detect mime type of fileHeader " + fileHeaderInputStream,
+          e,
           LogService::logInternalServerError);
     }
     if (mimeType.isEmpty() || !mimeTypeWhitelist.contains(mimeType.get())) {

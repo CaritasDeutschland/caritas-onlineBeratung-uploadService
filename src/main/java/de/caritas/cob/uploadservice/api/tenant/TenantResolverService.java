@@ -2,16 +2,18 @@ package de.caritas.cob.uploadservice.api.tenant;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import javax.servlet.http.HttpServletRequest;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -20,17 +22,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class TenantResolverService {
 
-  @NonNull
-  CustomHeaderTenantResolver customHeaderTenantResolver;
+  @NonNull CustomHeaderTenantResolver customHeaderTenantResolver;
 
-  @NonNull
-  SubdomainTenantResolver subdomainTenantResolver;
+  @NonNull SubdomainTenantResolver subdomainTenantResolver;
 
-  @NonNull
-  TechnicalUserTenantResolver technicalUserTenantResolver;
+  @NonNull TechnicalUserTenantResolver technicalUserTenantResolver;
 
-  @NonNull
-  AccessTokenTenantResolver accessTokenTenantResolver;
+  @NonNull AccessTokenTenantResolver accessTokenTenantResolver;
 
   @Value("${feature.multitenancy.with.single.domain.enabled}")
   private boolean multitenancyWithSingleDomain;
@@ -61,8 +59,8 @@ public class TenantResolverService {
       return tenantId.orElseThrow();
     } else {
       if (shouldValidateResolvedTenant(tenantId)) {
-        Optional<Long> tenantIdFromCustomHeaderOrSubdomain = getFirstResolvedTenant(request,
-            tenantIdCrossValidationResolvers());
+        Optional<Long> tenantIdFromCustomHeaderOrSubdomain =
+            getFirstResolvedTenant(request, tenantIdCrossValidationResolvers());
         validateResolvedTenantMatch(tenantId, tenantIdFromCustomHeaderOrSubdomain);
       }
       return tenantId.orElseThrow();
@@ -85,8 +83,8 @@ public class TenantResolverService {
     return tenantId.get();
   }
 
-  private  void validateResolvedTenantMatch(Optional<Long> tenantId,
-      Optional<Long> tenantIdFromHeaderOrSubdomain) {
+  private void validateResolvedTenantMatch(
+      Optional<Long> tenantId, Optional<Long> tenantIdFromHeaderOrSubdomain) {
     if (tenantId.isPresent() && tenantIdFromHeaderOrSubdomain.isPresent()) {
       if (!tenantId.get().equals(tenantIdFromHeaderOrSubdomain.get())) {
         throw new AccessDeniedException("Tenant id from claim and subdomain not same.");
@@ -96,8 +94,8 @@ public class TenantResolverService {
     }
   }
 
-  private Optional<Long> getFirstResolvedTenant(HttpServletRequest request,
-      List<TenantResolver> tenantResolvers) {
+  private Optional<Long> getFirstResolvedTenant(
+      HttpServletRequest request, List<TenantResolver> tenantResolvers) {
     for (TenantResolver tenantResolver : tenantResolvers) {
       if (tenantResolver.canResolve(request)) {
         return tenantResolver.resolve(request);
@@ -107,6 +105,10 @@ public class TenantResolverService {
   }
 
   private boolean userIsAuthenticated(HttpServletRequest request) {
-    return request.getUserPrincipal() != null;
+    /* after upgrade to oauth2ResourceServer security configuration (spring 6.x upgrade)
+    for authenticated users request.getUserPrincipal() might be still null at the time of HttpTenantFilter is executed
+    but BearerTokenAuthenticationFilter has already set the principal in the SecurityContext */
+    SecurityContext context = SecurityContextHolder.getContext();
+    return context.getAuthentication() != null && context.getAuthentication().isAuthenticated();
   }
 }

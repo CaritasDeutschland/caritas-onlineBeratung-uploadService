@@ -3,22 +3,21 @@ package de.caritas.cob.uploadservice.api.service;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.powermock.reflect.Whitebox.setInternalState;
 
 import de.caritas.cob.uploadservice.UploadServiceApplication;
 import de.caritas.cob.uploadservice.api.exception.httpresponses.QuotaReachedException;
 import de.caritas.cob.uploadservice.api.helper.AuthenticatedUser;
 import de.caritas.cob.uploadservice.api.model.UploadByUser;
 import de.caritas.cob.uploadservice.api.repository.UploadByUserRepository;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,33 +26,28 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = UploadServiceApplication.class)
 @TestPropertySource(properties = "spring.profiles.active=testing")
 @AutoConfigureTestDatabase(replace = Replace.ANY)
 public class UploadTrackingServiceIT {
 
-  @Autowired
-  private UploadTrackingService uploadTrackingService;
+  @Autowired private UploadTrackingService uploadTrackingService;
 
-  @Autowired
-  private UploadByUserRepository uploadByUserRepository;
+  @Autowired private UploadByUserRepository uploadByUserRepository;
 
-  @MockBean
-  private AuthenticatedUser authenticatedUser;
+  @MockBean private AuthenticatedUser authenticatedUser;
 
-  @Mock
-  private Logger logger;
+  @Mock private Logger logger;
 
-  @Before
+  @BeforeEach
   public void setup() {
     when(this.authenticatedUser.getUserId()).thenReturn("userId");
-    setInternalState(LogService.class, "LOGGER", logger);
+    ReflectionTestUtils.setField(LogService.class, "LOGGER", logger);
   }
 
-  @After
+  @AfterEach
   public void cleanDatabase() {
     this.uploadByUserRepository.deleteAll();
   }
@@ -80,8 +74,8 @@ public class UploadTrackingServiceIT {
     trackUploadedFile(10);
 
     assertThat(this.uploadByUserRepository.count(), is(10L));
-    assertThat(this.uploadByUserRepository.countAllByUserIdAndSessionId("userId", "sessionId"),
-        is(10));
+    assertThat(
+        this.uploadByUserRepository.countAllByUserIdAndSessionId("userId", "sessionId"), is(10));
   }
 
   @Test
@@ -95,15 +89,20 @@ public class UploadTrackingServiceIT {
     }
   }
 
-  @Test(expected = QuotaReachedException.class)
+  @Test
   public void validateUploadLimit_Should_throwQuotaReachedException_When_limitIsReached() {
-    trackUploadedFile(7);
+    assertThrows(
+        QuotaReachedException.class,
+        () -> {
+          trackUploadedFile(7);
 
-    this.uploadTrackingService.validateUploadLimit("sessionId");
+          this.uploadTrackingService.validateUploadLimit("sessionId");
+        });
   }
 
   @Test
-  public void validateUploadLimit_Should_notThrowQuotaException_When_limitIsNotReachedForGivenSession() {
+  public void
+      validateUploadLimit_Should_notThrowQuotaException_When_limitIsNotReachedForGivenSession() {
     trackUploadedFile(7);
 
     try {
@@ -130,5 +129,4 @@ public class UploadTrackingServiceIT {
 
     verify(this.logger, times(1)).info(eq("File restrictions are reset!"));
   }
-
 }

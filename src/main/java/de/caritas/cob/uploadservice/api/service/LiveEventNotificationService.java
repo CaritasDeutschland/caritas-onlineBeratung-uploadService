@@ -13,9 +13,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 
-/**
- * Service class to provide live event triggers to the live proxy endpoint in user service.
- */
+/** Service class to provide live event triggers to the live proxy endpoint in user service. */
 @Service
 @RequiredArgsConstructor
 public class LiveEventNotificationService {
@@ -32,13 +30,14 @@ public class LiveEventNotificationService {
   @Async
   public void sendLiveEvent(String rcGroupId, String accessToken, Optional<Long> tenantId) {
     if (isNotBlank(rcGroupId)) {
-      LiveproxyControllerApi liveproxyControllerApi = liveProxyApiControllerFactory.createControllerApi();
+      LiveproxyControllerApi liveproxyControllerApi =
+          liveProxyApiControllerFactory.createControllerApi();
       addDefaultHeaders(liveproxyControllerApi.getApiClient(), accessToken, tenantId);
       try {
         liveproxyControllerApi.sendLiveEvent(rcGroupId);
       } catch (RestClientException e) {
         LogService.logInternalServerError(
-            String.format("Unable to trigger live event for rc group id %s", rcGroupId), e);
+            "Unable to trigger live event for rc group id %s".formatted(rcGroupId), e);
       }
     }
   }
@@ -47,5 +46,4 @@ public class LiveEventNotificationService {
     var headers = serviceHelper.getKeycloakAndCsrfHttpHeaders(accessToken, tenantId);
     headers.forEach((key, value) -> apiClient.addDefaultHeader(key, value.iterator().next()));
   }
-
 }

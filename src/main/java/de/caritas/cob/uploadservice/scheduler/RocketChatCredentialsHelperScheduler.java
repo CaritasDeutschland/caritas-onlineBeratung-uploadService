@@ -4,7 +4,7 @@ import de.caritas.cob.uploadservice.api.exception.RocketChatLoginException;
 import de.caritas.cob.uploadservice.api.exception.httpresponses.InternalServerErrorException;
 import de.caritas.cob.uploadservice.api.service.LogService;
 import de.caritas.cob.uploadservice.api.service.helper.RocketChatCredentialsHelper;
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;

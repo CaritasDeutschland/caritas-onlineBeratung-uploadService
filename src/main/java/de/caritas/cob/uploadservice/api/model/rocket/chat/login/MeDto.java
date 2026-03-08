@@ -10,6 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class MeDto {
+
   private String username;
   private String _id;
   private String status;

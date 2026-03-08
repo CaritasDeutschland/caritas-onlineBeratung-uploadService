@@ -5,12 +5,11 @@ import static java.util.Optional.of;
 
 import de.caritas.cob.uploadservice.api.service.TenantService;
 import de.caritas.cob.uploadservice.filter.SubdomainExtractor;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Optional;
-import javax.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
-
 
 @AllArgsConstructor
 @Component
@@ -22,11 +21,11 @@ public class SubdomainTenantResolver implements TenantResolver {
 
   @Override
   public Optional<Long> resolve(HttpServletRequest request) {
-    return resolveTenantFromSubdomain();
+    return resolveTenantFromSubdomain(request);
   }
 
-  private Optional<Long> resolveTenantFromSubdomain() {
-    Optional<String> currentSubdomain = subdomainExtractor.getCurrentSubdomain();
+  private Optional<Long> resolveTenantFromSubdomain(HttpServletRequest request) {
+    Optional<String> currentSubdomain = subdomainExtractor.getCurrentSubdomain(request);
     if (currentSubdomain.isPresent()) {
       return of(getTenantIdBySubdomain(currentSubdomain.get()));
     } else {

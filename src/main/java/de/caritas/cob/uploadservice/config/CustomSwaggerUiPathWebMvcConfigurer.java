@@ -13,8 +13,9 @@ public class CustomSwaggerUiPathWebMvcConfigurer implements WebMvcConfigurer {
 
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
-    registry.addResourceHandler(docuPath + "/swagger-ui/**")
-            .addResourceLocations("classpath:/META-INF/resources/webjars/springfox-swagger-ui/");
+    registry
+        .addResourceHandler(docuPath + "/swagger-ui/**")
+        .addResourceLocations("classpath:/META-INF/resources/webjars/springfox-swagger-ui/");
     registry
         .addResourceHandler(docuPath + "/**")
         .addResourceLocations("classpath:/META-INF/resources/");

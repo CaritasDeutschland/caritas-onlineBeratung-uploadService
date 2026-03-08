@@ -14,13 +14,10 @@ import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-/**
- * Definition of all authorities and of the role-authority-mapping
- */
+/** Definition of all authorities and of the role-authority-mapping */
 @Getter
 @AllArgsConstructor
 public enum Authority {
-
   USER(UserRole.USER, singletonList(USER_DEFAULT)),
   CONSULTANT(UserRole.CONSULTANT, singletonList(CONSULTANT_DEFAULT)),
   U25_CONSULTANT(UserRole.PEER_CONSULTANT, singletonList(USE_FEEDBACK)),
@@ -37,18 +34,17 @@ public enum Authority {
    * @return the related authorities
    */
   public static List<String> getAuthoritiesByUserRole(UserRole userRole) {
-    Optional<Authority> authorityByUserRole = Stream.of(values())
-        .filter(authority -> authority.userRole.equals(userRole))
-        .findFirst();
+    Optional<Authority> authorityByUserRole =
+        Stream.of(values()).filter(authority -> authority.userRole.equals(userRole)).findFirst();
 
-    return authorityByUserRole.isPresent() ? authorityByUserRole.get().getGrantedAuthorities()
+    return authorityByUserRole.isPresent()
+        ? authorityByUserRole.get().getGrantedAuthorities()
         : emptyList();
   }
 
   public static final class AuthorityValue {
 
-    private AuthorityValue() {
-    }
+    private AuthorityValue() {}
 
     public static final String PREFIX = "AUTHORIZATION_";
 
@@ -57,7 +53,5 @@ public enum Authority {
     public static final String USE_FEEDBACK = PREFIX + "USE_FEEDBACK";
     public static final String TECHNICAL_DEFAULT = PREFIX + "TECHNICAL_DEFAULT";
     public static final String ANONYMOUS_DEFAULT = PREFIX + "ANONYMOUS_DEFAULT";
-
   }
-
 }

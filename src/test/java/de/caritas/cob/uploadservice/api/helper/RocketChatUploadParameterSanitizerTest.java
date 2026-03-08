@@ -9,20 +9,20 @@ import static de.caritas.cob.uploadservice.helper.TestConstants.RC_ROOM_ID_WITH_
 import static de.caritas.cob.uploadservice.helper.TestConstants.RC_TMID;
 import static de.caritas.cob.uploadservice.helper.TestConstants.RC_TMID_WITH_HTML;
 import static de.caritas.cob.uploadservice.helper.TestConstants.UPLOAD_FILE;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import de.caritas.cob.uploadservice.api.container.RocketChatUploadParameter;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class RocketChatUploadParameterSanitizerTest {
 
   private RocketChatUploadParameterSanitizer rocketChatUploadParameterSanitizer;
 
-  @Before
+  @BeforeEach
   public void setup() {
     rocketChatUploadParameterSanitizer = new RocketChatUploadParameterSanitizer();
   }

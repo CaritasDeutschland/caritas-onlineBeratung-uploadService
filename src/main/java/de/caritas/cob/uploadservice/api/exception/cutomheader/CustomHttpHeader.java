@@ -3,12 +3,9 @@ package de.caritas.cob.uploadservice.api.exception.cutomheader;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 
-/**
- * Constants to build custom http headers.
- */
+/** Constants to build custom http headers. */
 @AllArgsConstructor
 public enum CustomHttpHeader {
-
   QUOTA_REACHED("X-Reason", "QUOTA_REACHED");
 
   private final String headerName;
@@ -24,5 +21,4 @@ public enum CustomHttpHeader {
     headers.add(headerName, headerValue);
     return headers;
   }
-
 }

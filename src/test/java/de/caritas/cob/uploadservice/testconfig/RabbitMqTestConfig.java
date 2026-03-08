@@ -18,7 +18,8 @@ public class RabbitMqTestConfig {
   private static final String QUEUE_PREFIX = "statistics.";
   public static final String QUEUE_NAME_CREATE_MESSAGE = QUEUE_PREFIX + EventType.CREATE_MESSAGE;
 
-  @Bean ConnectionFactory connectionFactory() {
+  @Bean
+  ConnectionFactory connectionFactory() {
     return new CachingConnectionFactory(new MockConnectionFactory());
   }
 
@@ -31,9 +32,8 @@ public class RabbitMqTestConfig {
     return new Declarables(
         assignSessionStatisticEventQueue,
         topicExchange,
-        BindingBuilder
-            .bind(assignSessionStatisticEventQueue)
-            .to(topicExchange).with(
-                EventType.CREATE_MESSAGE));
+        BindingBuilder.bind(assignSessionStatisticEventQueue)
+            .to(topicExchange)
+            .with(EventType.CREATE_MESSAGE));
   }
 }

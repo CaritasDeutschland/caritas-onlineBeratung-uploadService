@@ -1,16 +1,16 @@
 package de.caritas.cob.uploadservice.api.authorization;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.caritas.cob.uploadservice.api.authorization.Authority.AuthorityValue;
 import java.util.List;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class AuthorityTest {
 
   @Test
@@ -52,5 +52,4 @@ public class AuthorityTest {
     assertTrue(result.contains(AuthorityValue.TECHNICAL_DEFAULT));
     assertEquals(1, result.size());
   }
-
 }

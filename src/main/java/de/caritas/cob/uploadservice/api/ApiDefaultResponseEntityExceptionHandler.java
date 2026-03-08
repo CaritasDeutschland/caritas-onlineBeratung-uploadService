@@ -22,9 +22,9 @@ public class ApiDefaultResponseEntityExceptionHandler {
    * @param request WebRequest
    * @return
    */
-  @ExceptionHandler({RuntimeException.class})
-  public ResponseEntity<Object> handleInternal(final RuntimeException ex,
-      final WebRequest request) {
+  @ExceptionHandler({Exception.class})
+  public ResponseEntity<Object> handleInternal(
+      final RuntimeException ex, final WebRequest request) {
     LogService.logInternalServerError(ex);
 
     return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

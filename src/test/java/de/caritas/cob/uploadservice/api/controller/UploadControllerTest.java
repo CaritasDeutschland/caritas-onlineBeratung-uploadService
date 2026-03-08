@@ -4,30 +4,27 @@ import static de.caritas.cob.uploadservice.helper.MethodAndParameterConstants.UP
 import static de.caritas.cob.uploadservice.helper.MethodAndParameterConstants.UPLOAD_FILE_TO_FEEDBACK_ROOM_METHOD_PARAMS;
 import static de.caritas.cob.uploadservice.helper.MethodAndParameterConstants.UPLOAD_FILE_TO_ROOM_METHOD_NAME;
 import static de.caritas.cob.uploadservice.helper.MethodAndParameterConstants.UPLOAD_FILE_TO_ROOM_METHOD_PARAMS;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import de.caritas.cob.uploadservice.api.aspect.TempCleanup;
 import de.caritas.cob.uploadservice.api.facade.UploadFacade;
 import de.caritas.cob.uploadservice.api.service.EncryptionService;
 import java.lang.reflect.Method;
-import lombok.NonNull;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import java.util.Arrays;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class UploadControllerTest {
 
-  @InjectMocks
-  private UploadController uploadController;
+  @InjectMocks private UploadController uploadController;
 
-  @Mock
-  private UploadFacade uploadFacade;
+  @Mock private UploadFacade uploadFacade;
 
-  @Mock
-  private EncryptionService encryptionService;
+  @Mock private EncryptionService encryptionService;
 
   @Test
   public void test_Should_Fail_WhenMethodUploadFileToRoomDoesNotHaveTempCleanupAnnotation()
@@ -46,9 +43,20 @@ public class UploadControllerTest {
       throws NoSuchMethodException {
 
     Class classToTest = uploadController.getClass();
+
+    System.out.println("Declared Methods: ");
+    for (Method method : classToTest.getDeclaredMethods()) {
+      System.out.println(method.getName());
+    }
+
+    for (Method method : classToTest.getMethods()) {
+      System.out.println(method.getName() + " -> " + Arrays.toString(method.getParameterTypes()));
+    }
+
     Method methodToTest =
         classToTest.getMethod(
             UPLOAD_FILE_TO_FEEDBACK_ROOM_METHOD_NAME, UPLOAD_FILE_TO_FEEDBACK_ROOM_METHOD_PARAMS);
+
     TempCleanup annotation = methodToTest.getAnnotation(TempCleanup.class);
 
     assertNotNull(annotation);

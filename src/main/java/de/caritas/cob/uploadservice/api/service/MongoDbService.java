@@ -28,7 +28,8 @@ public class MongoDbService {
    * @param messageId ID of the message
    */
   public void setE2eType(String messageId) {
-    MongoCollection<Document> messageCollection = mongoClient.getDatabase("rocketchat").getCollection("rocketchat_message");
+    MongoCollection<Document> messageCollection =
+        mongoClient.getDatabase("rocketchat").getCollection("rocketchat_message");
     Bson filter = eq("_id", messageId);
     Bson update = set("t", "e2e");
     UpdateResult result = messageCollection.updateOne(filter, update);
@@ -40,5 +41,4 @@ public class MongoDbService {
           LogService::logInternalServerError);
     }
   }
-
 }

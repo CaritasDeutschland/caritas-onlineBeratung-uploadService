@@ -4,45 +4,46 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Optional;
-import javax.servlet.http.HttpServletRequest;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
-import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @ExtendWith(MockitoExtension.class)
 class TenantResolverServiceTest {
 
   public static final long TECHNICAL_CONTEXT = 0L;
 
-  @Mock
-  SubdomainTenantResolver subdomainTenantResolver;
+  @Mock SubdomainTenantResolver subdomainTenantResolver;
 
-  @Mock
-  AccessTokenTenantResolver accessTokenTenantResolver;
+  @Mock AccessTokenTenantResolver accessTokenTenantResolver;
 
-  @Mock
-  HttpServletRequest authenticatedRequest;
+  @Mock HttpServletRequest authenticatedRequest;
 
-  @Mock
-  HttpServletRequest nonAuthenticatedRequest;
+  @Mock HttpServletRequest nonAuthenticatedRequest;
 
-  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  KeycloakAuthenticationToken token;
+  @InjectMocks TenantResolverService tenantResolverService;
 
-  @InjectMocks
-  TenantResolverService tenantResolverService;
+  @Mock private CustomHeaderTenantResolver customHeaderTenantResolver;
 
-  @Mock
-  private CustomHeaderTenantResolver customHeaderTenantResolver;
+  @Mock private TechnicalUserTenantResolver technicalUserTenantResolver;
 
-  @Mock
-  private TechnicalUserTenantResolver technicalUserTenantResolver;
+  @Mock private SecurityContext mockSecurityContext;
+
+  @Mock private Authentication mockAuthentication;
+
+  @AfterEach
+  void tearDown() {
+    SecurityContextHolder.clearContext();
+  }
 
   @Test
   void resolve_Should_ResolveFromAccessTokenForAuthenticatedUser_And_PassValidation() {
@@ -61,11 +62,14 @@ class TenantResolverServiceTest {
   }
 
   private void givenUserIsAuthenticated() {
-    when(authenticatedRequest.getUserPrincipal()).thenReturn(token);
+    SecurityContextHolder.setContext(mockSecurityContext);
+    when(mockSecurityContext.getAuthentication()).thenReturn(mockAuthentication);
+    when(mockAuthentication.isAuthenticated()).thenReturn(true);
   }
 
   @Test
-  void resolve_Should_ThrowAccessDeniedException_ForAuthenticatedUser_When_SubdomainTenantIdDoesNotMatchTenantIdFromToken() {
+  void
+      resolve_Should_ThrowAccessDeniedException_ForAuthenticatedUser_When_SubdomainTenantIdDoesNotMatchTenantIdFromToken() {
     // given
 
     givenUserIsAuthenticated();
@@ -75,26 +79,30 @@ class TenantResolverServiceTest {
     when(subdomainTenantResolver.resolve(authenticatedRequest)).thenReturn(Optional.of(2L));
 
     // when, then
-    assertThrows(AccessDeniedException.class, () -> tenantResolverService.resolve(authenticatedRequest));
+    assertThrows(
+        AccessDeniedException.class, () -> tenantResolverService.resolve(authenticatedRequest));
   }
 
   @Test
-  void resolve_Should_ThrowAccessDeniedExceptionForAuthenticatedUser_IfAccessTokenResolverCannotResolveTenant() {
+  void
+      resolve_Should_ThrowAccessDeniedExceptionForAuthenticatedUser_IfAccessTokenResolverCannotResolveTenant() {
     // given
     givenUserIsAuthenticated();
     when(accessTokenTenantResolver.canResolve(authenticatedRequest)).thenReturn(false);
 
     // when, then
-    assertThrows(AccessDeniedException.class, () -> tenantResolverService.resolve(authenticatedRequest));
+    assertThrows(
+        AccessDeniedException.class, () -> tenantResolverService.resolve(authenticatedRequest));
   }
 
   @Test
-  void resolve_Should_ThrowAccessDeniedExceptionForNotAuthenticatedUser_IfSubdomainCouldNotBeDetermined() {
+  void
+      resolve_Should_ThrowAccessDeniedExceptionForNotAuthenticatedUser_IfSubdomainCouldNotBeDetermined() {
     // given
     when(subdomainTenantResolver.canResolve(nonAuthenticatedRequest)).thenReturn(false);
     // when, then
-    assertThrows(AccessDeniedException.class,
-        () -> tenantResolverService.resolve(nonAuthenticatedRequest));
+    assertThrows(
+        AccessDeniedException.class, () -> tenantResolverService.resolve(nonAuthenticatedRequest));
   }
 
   @Test
@@ -113,7 +121,8 @@ class TenantResolverServiceTest {
     // given
     givenUserIsAuthenticated();
     when(technicalUserTenantResolver.canResolve(authenticatedRequest)).thenReturn(true);
-    when(technicalUserTenantResolver.resolve(authenticatedRequest)).thenReturn(Optional.of(TECHNICAL_CONTEXT));
+    when(technicalUserTenantResolver.resolve(authenticatedRequest))
+        .thenReturn(Optional.of(TECHNICAL_CONTEXT));
 
     Long resolved = tenantResolverService.resolve(authenticatedRequest);
     // then
@@ -132,5 +141,4 @@ class TenantResolverServiceTest {
     // then
     assertThat(resolved).isEqualTo(2L);
   }
-
 }

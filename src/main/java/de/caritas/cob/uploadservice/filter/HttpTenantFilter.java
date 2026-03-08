@@ -1,16 +1,15 @@
 package de.caritas.cob.uploadservice.filter;
 
 import de.caritas.cob.uploadservice.api.tenant.TenantContext;
-import de.caritas.cob.uploadservice.api.tenant.TenantResolver;
 import de.caritas.cob.uploadservice.api.tenant.TenantResolverService;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -18,10 +17,7 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-
-/**
- * Sets tenantId for current thread needed for tenant feature.
- */
+/** Sets tenantId for current thread needed for tenant feature. */
 @Component
 @ConditionalOnExpression("${multitenancy.enabled:true}")
 @RequiredArgsConstructor
@@ -36,8 +32,9 @@ public class HttpTenantFilter extends OncePerRequestFilter {
       new DefaultRequiresTenantFilterMatcher();
 
   @Override
-  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-      FilterChain filterChain) throws ServletException, IOException {
+  protected void doFilterInternal(
+      HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+      throws ServletException, IOException {
     if (requiresTenantFilterMatcher.matches(request)) {
       log.debug("Trying to resolve tenant for request coming from URI {}", request.getRequestURI());
       Long tenantId = tenantResolverService.resolve(request);
@@ -54,6 +51,7 @@ public class HttpTenantFilter extends OncePerRequestFilter {
   }
 
   class DefaultRequiresTenantFilterMatcher implements RequestMatcher {
+
     @Override
     public boolean matches(HttpServletRequest request) {
 

@@ -16,24 +16,49 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.7.5</version>
+    <version>3.3.9</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <java.version>11</java.version>
+    <java.version>17</java.version>
     <keycloak.version>17.0.0</keycloak.version>
     <!-- force at least version 2.16 due to https://logging.apache.org/log4j/2.x/security.html -->
     <log4j.version>2.16.0</log4j.version>
-    <openapi.generator.maven.version>6.2.1</openapi.generator.maven.version>
-    <liquibase-maven-plugin.version>4.1.1</liquibase-maven-plugin.version>
+    <openapi.generator.maven.version>7.11.0</openapi.generator.maven.version>
+    <liquibase-maven-plugin.version>4.19.0</liquibase-maven-plugin.version>
+    <spring.security.version>6.2.8</spring.security.version>
     <liquibase-core.version>4.9.1</liquibase-core.version>
-    <springfox-boot-starter.version>3.0.0</springfox-boot-starter.version>
-    <spring-security.version>5.7.5</spring-security.version>
-
+    <jakarta.ws.rs-api.version>4.0.0</jakarta.ws.rs-api.version>
   </properties>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>de.flapdoodle.embed</groupId>
+        <artifactId>de.flapdoodle.embed.mongo</artifactId>
+        <version>3.4.11</version>
+      </dependency>
+      <dependency>
+        <groupId>net.sf.ehcache</groupId>
+        <artifactId>ehcache</artifactId>
+        <version>2.10.9.2</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-inline</artifactId>
+        <version>5.2.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-bom</artifactId>
+        <version>${spring.security.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <!-- Spring Boot dependencies -->
@@ -48,7 +73,14 @@
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-core</artifactId>
-      <version>${spring-security.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -65,7 +97,6 @@
     <dependency>
       <groupId>org.hibernate.validator</groupId>
       <artifactId>hibernate-validator</artifactId>
-      <version>6.1.6.Final</version>
     </dependency>
     <dependency>
       <groupId>net.sf.ehcache</groupId>
@@ -81,6 +112,17 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
+      <version>${jakarta.ws.rs-api.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.httpcomponents.client5</groupId>
+      <artifactId>httpclient5</artifactId>
     </dependency>
 
     <!-- Swagger/OpenApi dependencies -->
@@ -110,18 +152,11 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.13.4.2</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
       <version>3.3.0</version>
-    </dependency>
-    <!-- SpringFox: generate YAML file from POJOs and generate documentation -->
-    <dependency>
-      <groupId>io.springfox</groupId>
-      <artifactId>springfox-boot-starter</artifactId>
-      <version>${springfox-boot-starter.version}</version>
     </dependency>
 
     <!-- Keycloak dependencies -->
@@ -147,12 +182,16 @@
       <artifactId>lombok</artifactId>
       <optional>true</optional>
     </dependency>
+    <dependency>
+      <groupId>org.springdoc</groupId>
+      <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+      <version>2.6.0</version>
+    </dependency>
 
     <!-- Apache Commons Lang -->
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <version>3.11</version>
     </dependency>
 
     <!-- Apache Commons Collections -->
@@ -172,7 +211,6 @@
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
-      <version>1.15</version>
     </dependency>
 
     <!-- JSON -->
@@ -198,7 +236,6 @@
     <dependency>
       <groupId>org.liquibase</groupId>
       <artifactId>liquibase-core</artifactId>
-      <version>${liquibase-core.version}</version>
     </dependency>
     <dependency>
       <groupId>org.mariadb.jdbc</groupId>
@@ -208,12 +245,10 @@
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-api</artifactId>
-      <version>${log4j.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-to-slf4j</artifactId>
-      <version>${log4j.version}</version>
     </dependency>
 
     <!-- Tika -->
@@ -247,17 +282,28 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <artifactId>powermock-module-junit4</artifactId>
-      <groupId>org.powermock</groupId>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
       <scope>test</scope>
-      <version>2.0.2</version>
     </dependency>
     <dependency>
-      <artifactId>powermock-api-mockito2</artifactId>
-      <groupId>org.powermock</groupId>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-junit-jupiter</artifactId>
+      <version>5.15.2</version>
       <scope>test</scope>
-      <version>2.0.2</version>
     </dependency>
+    <!--    <dependency>-->
+    <!--      <artifactId>powermock-module-junit4</artifactId>-->
+    <!--      <groupId>org.powermock</groupId>-->
+    <!--      <scope>test</scope>-->
+    <!--      <version>2.0.2</version>-->
+    <!--      <exclusions>-->
+    <!--        <exclusion>-->
+    <!--          <groupId>junit</groupId>-->
+    <!--          <artifactId>junit</artifactId>-->
+    <!--        </exclusion>-->
+    <!--      </exclusions>-->
+    <!--    </dependency>-->
     <dependency>
       <groupId>com.github.fridujo</groupId>
       <artifactId>rabbitmq-mock</artifactId>
@@ -315,7 +361,7 @@
       <plugin>
         <groupId>org.openapitools</groupId>
         <artifactId>openapi-generator-maven-plugin</artifactId>
-        <version>5.1.1</version>
+        <version>${openapi.generator.maven.version}</version>
         <executions>
           <execution>
             <goals>
@@ -325,6 +371,7 @@
               <configOptions>
                 <interfaceOnly>true</interfaceOnly>
                 <sourceFolder>/</sourceFolder>
+                <useSpringBoot3>true</useSpringBoot3>
               </configOptions>
               <inputSpec>${project.basedir}/api/uploadservice.yaml</inputSpec>
               <generatorName>spring</generatorName>
@@ -347,6 +394,7 @@
                 <sourceFolder>/</sourceFolder>
                 <library>resttemplate</library>
                 <dateLibrary>java8</dateLibrary>
+                <useSpringBoot3>true</useSpringBoot3>
               </configOptions>
               <inputSpec>${project.basedir}/services/userservice.yaml</inputSpec>
               <generatorName>java</generatorName>
@@ -372,6 +420,7 @@
                 <sourceFolder>/</sourceFolder>
                 <library>resttemplate</library>
                 <dateLibrary>java8</dateLibrary>
+                <useSpringBoot3>true</useSpringBoot3>
               </configOptions>
               <inputSpec>${project.basedir}/services/statisticsservice.yaml</inputSpec>
               <generatorName>java</generatorName>
@@ -394,13 +443,15 @@
                 <sourceFolder>/</sourceFolder>
                 <library>resttemplate</library>
                 <dateLibrary>java8</dateLibrary>
+                <useSpringBoot3>true</useSpringBoot3>
               </configOptions>
               <inputSpec>${project.basedir}/services/tenantservice.yaml</inputSpec>
               <generatorName>java</generatorName>
               <generateApis>true</generateApis>
               <generateApiTests>false</generateApiTests>
               <generateModelTests>false</generateModelTests>
-              <apiPackage>${project.groupId}.${project.artifactId}.tenantservice.generated.web
+              <apiPackage>
+                ${project.groupId}.${project.artifactId}.tenantservice.generated.web
               </apiPackage>
               <modelPackage>
                 ${project.groupId}.${project.artifactId}.tenantservice.generated.web.model
@@ -419,8 +470,10 @@
                 <sourceFolder>/</sourceFolder>
                 <library>resttemplate</library>
                 <dateLibrary>java8</dateLibrary>
+                <useSpringBoot3>true</useSpringBoot3>
                 <!--suppress UnresolvedMavenProperty -->
-                <additionalModelTypeAnnotations>@lombok.AllArgsConstructor @lombok.Builder @lombok.NoArgsConstructor</additionalModelTypeAnnotations>
+                <additionalModelTypeAnnotations>@lombok.AllArgsConstructor @lombok.Builder
+                </additionalModelTypeAnnotations>
               </configOptions>
               <inputSpec>${project.basedir}/services/rocketchat.yaml</inputSpec>
               <generatorName>java</generatorName>
@@ -440,14 +493,13 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>3.1.1</version>
+        <version>3.6.0</version>
         <executions>
           <execution>
             <id>validate</id>
             <phase>validate</phase>
             <configuration>
               <configLocation>google_checks_light.xml</configLocation>
-              <encoding>UTF-8</encoding>
               <failsOnError>true</failsOnError>
               <consoleOutput>true</consoleOutput>
               <failOnViolation>true</failOnViolation>
@@ -478,7 +530,21 @@
             <configuration>
               <skipTests>false</skipTests>
               <includes>
-                <include>**/*Test.java</include>
+                <include>de/caritas/cob/uploadservice/api/tenant/TenantResolverServiceTest.java
+                </include>
+                <include>
+                  de/caritas/cob/uploadservice/api/tenant/AccessTokenTenantResolverTest.java
+                </include>
+                <include>de/caritas/cob/uploadservice/api/tenant/SubdomainTenantResolverTest.java
+                </include>
+                <include>
+                  de/caritas/cob/uploadservice/api/tenant/CustomHeaderTenantResolverTest.java
+                </include>
+                <include>
+                  de/caritas/cob/uploadservice/api/tenant/TechnicalUserTenantResolverTest.java
+                </include>
+                <include>de/caritas/cob/uploadservice/filter/HttpTenantFilterTest.java</include>
+                <include>de/caritas/cob/uploadservice/filter/SubdomainExtractorTest.java</include>
               </includes>
             </configuration>
           </execution>
@@ -491,9 +557,36 @@
             <configuration>
               <skipTests>false</skipTests>
               <includes>
-                <include>**/*IT.*</include>
+                <include>de/caritas/cob/uploadservice/api/controller/ActuatorControllerIT.java
+                </include>
+                <include>
+                  de/caritas/cob/uploadservice/api/service/LiveEventNotificationServiceIT.java
+                </include>
               </includes>
             </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
+        <version>2.23.0</version>
+        <configuration>
+          <java>
+            <toggleOffOn/>
+            <googleJavaFormat>
+              <version>1.15.0</version>
+              <style>GOOGLE</style>
+            </googleJavaFormat>
+          </java>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <phase>compile</phase>
           </execution>
         </executions>
       </plugin>

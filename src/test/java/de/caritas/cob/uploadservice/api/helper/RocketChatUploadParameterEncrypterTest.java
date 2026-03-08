@@ -11,13 +11,13 @@ import static org.mockito.Mockito.verify;
 import de.caritas.cob.uploadservice.api.container.RocketChatUploadParameter;
 import de.caritas.cob.uploadservice.api.exception.CustomCryptoException;
 import de.caritas.cob.uploadservice.api.service.EncryptionService;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class RocketChatUploadParameterEncrypterTest {
 
   @Mock EncryptionService encryptionService;

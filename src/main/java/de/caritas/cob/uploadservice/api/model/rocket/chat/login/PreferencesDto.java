@@ -9,6 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class PreferencesDto {
+
   private String sidebarViewMode;
   private String sidebarGroupByType;
   private String sidebarHideAvatar;

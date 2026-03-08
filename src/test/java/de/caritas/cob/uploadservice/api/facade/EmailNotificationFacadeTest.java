@@ -9,15 +9,15 @@ import de.caritas.cob.uploadservice.api.helper.AuthenticatedUser;
 import de.caritas.cob.uploadservice.api.helper.EmailNotificationHelper;
 import de.caritas.cob.uploadservice.api.tenant.TenantContext;
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class EmailNotificationFacadeTest {
 
   private static final String FIELD_NAME_NEW_MESSAGE_NOTIFICATION =
@@ -34,10 +34,14 @@ public class EmailNotificationFacadeTest {
   @Mock private AuthenticatedUser authenticatedUser;
   @InjectMocks private EmailNotificationFacade emailNotificationFacade;
 
-  @Before
+  @BeforeEach
   public void setup() throws NoSuchFieldException, SecurityException {
-    ReflectionTestUtils.setField(emailNotificationFacade, FIELD_NAME_NEW_MESSAGE_NOTIFICATION, NOTIFICATION_API_URL);
-    ReflectionTestUtils.setField(emailNotificationFacade, FIELD_NAME_NEW_FEEDBACK_MESSAGE_NOTIFICATION, FEEDBACK_NOTIFICATION_API_URL);
+    ReflectionTestUtils.setField(
+        emailNotificationFacade, FIELD_NAME_NEW_MESSAGE_NOTIFICATION, NOTIFICATION_API_URL);
+    ReflectionTestUtils.setField(
+        emailNotificationFacade,
+        FIELD_NAME_NEW_FEEDBACK_MESSAGE_NOTIFICATION,
+        FEEDBACK_NOTIFICATION_API_URL);
   }
 
   @Test
@@ -49,7 +53,9 @@ public class EmailNotificationFacadeTest {
 
     verify(emailNotificationHelper, times(1))
         .sendEmailNotificationViaUserService(
-            RC_GROUP_ID, KEYCLOAK_ACCESS_TOKEN, Optional.ofNullable((TenantContext.getCurrentTenant())));
+            RC_GROUP_ID,
+            KEYCLOAK_ACCESS_TOKEN,
+            Optional.ofNullable((TenantContext.getCurrentTenant())));
   }
 
   @Test
@@ -62,6 +68,8 @@ public class EmailNotificationFacadeTest {
 
     verify(emailNotificationHelper, times(1))
         .sendEmailFeedbackNotificationViaUserService(
-            RC_GROUP_ID, KEYCLOAK_ACCESS_TOKEN, Optional.ofNullable(TenantContext.getCurrentTenant()));
+            RC_GROUP_ID,
+            KEYCLOAK_ACCESS_TOKEN,
+            Optional.ofNullable(TenantContext.getCurrentTenant()));
   }
 }

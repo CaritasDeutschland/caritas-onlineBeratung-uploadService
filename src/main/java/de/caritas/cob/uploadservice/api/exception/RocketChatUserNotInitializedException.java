@@ -5,5 +5,4 @@ public class RocketChatUserNotInitializedException extends Exception {
   public RocketChatUserNotInitializedException(String message) {
     super(message);
   }
-
 }

@@ -39,8 +39,7 @@ import de.caritas.cob.uploadservice.api.facade.UploadFacade;
 import de.caritas.cob.uploadservice.api.service.EncryptionService;
 import de.caritas.cob.uploadservice.api.service.LogService;
 import de.caritas.cob.uploadservice.api.service.RocketChatService;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -48,32 +47,24 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockPart;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-@RunWith(SpringRunner.class)
 @WebMvcTest(UploadController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @TestPropertySource(properties = "spring.profiles.active=testing")
 public class UploadControllerTestIT {
 
-  @Autowired
-  private MockMvc mvc;
+  @Autowired private MockMvc mvc;
 
-  @MockBean
-  private RocketChatService rocketChatService;
+  @MockBean private RocketChatService rocketChatService;
 
-  @MockBean
-  private EncryptionService encryptionService;
+  @MockBean private EncryptionService encryptionService;
 
-  @MockBean
-  private LogService logService;
+  @MockBean private LogService logService;
 
-  @MockBean
-  private UploadFacade uploadFacade;
+  @MockBean private UploadFacade uploadFacade;
 
-  @MockBean
-  private RoleAuthorizationAuthorityMapper roleAuthorizationAuthorityMapper;
+  @MockBean private RoleAuthorizationAuthorityMapper roleAuthorizationAuthorityMapper;
 
   @Test
   public void uploadFileToRoom_Should_ReturnNotFound_WhenRoomIdIsMissing() throws Exception {
@@ -276,8 +267,13 @@ public class UploadControllerTestIT {
   public void uploadFileToRoom_Should_ReturnForbiddenWithCustomHeader_When_quotaLimitIsReached()
       throws Exception {
     doThrow(new QuotaReachedException(LogService::logWarning))
-        .when(this.uploadFacade).uploadFileToRoom(any(RocketChatCredentials.class),
-            any(RocketChatUploadParameter.class), anyBoolean(), nullable(String.class), nullable(String.class));
+        .when(this.uploadFacade)
+        .uploadFileToRoom(
+            any(RocketChatCredentials.class),
+            any(RocketChatUploadParameter.class),
+            anyBoolean(),
+            nullable(String.class),
+            nullable(String.class));
 
     MockPart fileToUpload = new MockPart(FORM_PARAM_FILE, "fileToUpload", "content".getBytes());
 
@@ -298,9 +294,14 @@ public class UploadControllerTestIT {
   @Test
   public void uploadFileToRoom_should_return_unsupported_media_type_on_InvalidFileTypeException()
       throws Exception {
-    doThrow(InvalidFileTypeException.class).when(uploadFacade)
-        .uploadFileToRoom(any(RocketChatCredentials.class), any(RocketChatUploadParameter.class),
-            anyBoolean(), nullable(String.class), nullable(String.class));
+    doThrow(InvalidFileTypeException.class)
+        .when(uploadFacade)
+        .uploadFileToRoom(
+            any(RocketChatCredentials.class),
+            any(RocketChatUploadParameter.class),
+            anyBoolean(),
+            nullable(String.class),
+            nullable(String.class));
     MockPart fileToUpload = new MockPart(FORM_PARAM_FILE, "fileToUpload", "content".getBytes());
 
     mvc.perform(
@@ -317,11 +318,17 @@ public class UploadControllerTestIT {
   }
 
   @Test
-  public void uploadFileToFeedbackRoom_should_return_unsupported_media_type_on_InvalidFileTypeException()
-      throws Exception {
-    doThrow(InvalidFileTypeException.class).when(uploadFacade)
-        .uploadFileToFeedbackRoom(any(RocketChatCredentials.class),
-            any(RocketChatUploadParameter.class), anyBoolean(), nullable(String.class), nullable(String.class));
+  public void
+      uploadFileToFeedbackRoom_should_return_unsupported_media_type_on_InvalidFileTypeException()
+          throws Exception {
+    doThrow(InvalidFileTypeException.class)
+        .when(uploadFacade)
+        .uploadFileToFeedbackRoom(
+            any(RocketChatCredentials.class),
+            any(RocketChatUploadParameter.class),
+            anyBoolean(),
+            nullable(String.class),
+            nullable(String.class));
     MockPart fileToUpload = new MockPart(FORM_PARAM_FILE, "fileToUpload", "content".getBytes());
 
     mvc.perform(

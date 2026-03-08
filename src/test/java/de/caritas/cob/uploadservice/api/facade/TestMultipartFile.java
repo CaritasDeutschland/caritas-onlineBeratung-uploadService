@@ -44,7 +44,5 @@ public class TestMultipartFile implements MultipartFile {
   }
 
   @Override
-  public void transferTo(File file) throws IOException, IllegalStateException {
-
-  }
+  public void transferTo(File file) throws IOException, IllegalStateException {}
 }

@@ -34,8 +34,7 @@ public class CreateMessageStatisticsEvent implements StatisticsEvent {
     return EVENT_TYPE;
   }
 
-  private CreateMessageStatisticsEventMessage
-      createCreateMessageStatisticsEventMessage() {
+  private CreateMessageStatisticsEventMessage createCreateMessageStatisticsEventMessage() {
     return new CreateMessageStatisticsEventMessage()
         .eventType(EVENT_TYPE)
         .userId(userId)

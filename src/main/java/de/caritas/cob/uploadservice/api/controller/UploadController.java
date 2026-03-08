@@ -10,11 +10,8 @@ import de.caritas.cob.uploadservice.api.model.MasterKeyDto;
 import de.caritas.cob.uploadservice.api.service.EncryptionService;
 import de.caritas.cob.uploadservice.api.service.LogService;
 import de.caritas.cob.uploadservice.generated.api.controller.UploadsApi;
-import io.swagger.annotations.Api;
-import java.util.Objects;
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,12 +24,10 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-/**
- * Controller for upload requests.
- */
+/** Controller for upload requests. */
 @RestController
+@Tag(name = "upload-controller")
 @RequiredArgsConstructor
-@Api(tags = "upload-controller")
 public class UploadController implements UploadsApi {
 
   private final @NonNull UploadFacade uploadFacade;
@@ -72,7 +67,7 @@ public class UploadController implements UploadsApi {
   @TempCleanup
   @Override
   public ResponseEntity<Void> uploadFileToRoom(
-      @PathVariable("roomId") String roomId,
+      @PathVariable String roomId,
       @RequestHeader String rcToken,
       @RequestHeader String rcUserId,
       @RequestPart MultipartFile file,
@@ -100,8 +95,7 @@ public class UploadController implements UploadsApi {
         rocketChatUploadParameter,
         parseBoolean(sendNotification),
         t,
-        fileHeader
-    );
+        fileHeader);
 
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
@@ -122,7 +116,7 @@ public class UploadController implements UploadsApi {
   @TempCleanup
   @Override
   public ResponseEntity<Void> uploadFileToFeedbackRoom(
-      @PathVariable("feedbackRoomId") String feedbackRoomId,
+      @PathVariable String feedbackRoomId,
       @RequestHeader String rcToken,
       @RequestHeader String rcUserId,
       @RequestPart MultipartFile file,
@@ -150,8 +144,7 @@ public class UploadController implements UploadsApi {
         rocketChatUploadParameter,
         parseBoolean(sendNotification),
         t,
-        fileHeader
-    );
+        fileHeader);
 
     return new ResponseEntity<>(HttpStatus.CREATED);
   }

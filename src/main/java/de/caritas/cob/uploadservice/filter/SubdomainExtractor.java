@@ -1,18 +1,16 @@
 package de.caritas.cob.uploadservice.filter;
 
-
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.springframework.web.context.request.RequestContextHolder.currentRequestAttributes;
 
 import com.google.common.net.InternetDomainName;
 import de.caritas.cob.uploadservice.api.service.helper.HttpUrlUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Component
 @Setter
@@ -20,8 +18,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @AllArgsConstructor
 public class SubdomainExtractor {
 
-  public Optional<String> getCurrentSubdomain() {
-    var request = ((ServletRequestAttributes) currentRequestAttributes()).getRequest();
+  public Optional<String> getCurrentSubdomain(HttpServletRequest request) {
     String url = HttpUrlUtils.removeHttpPrefix(request.getServerName());
     return getSubdomain(url);
   }
@@ -37,4 +34,3 @@ public class SubdomainExtractor {
     return of(domain.parts().get(0));
   }
 }
-

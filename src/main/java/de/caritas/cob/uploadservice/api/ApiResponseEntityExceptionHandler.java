@@ -7,8 +7,9 @@ import de.caritas.cob.uploadservice.api.exception.KeycloakException;
 import de.caritas.cob.uploadservice.api.exception.httpresponses.InternalServerErrorException;
 import de.caritas.cob.uploadservice.api.exception.httpresponses.QuotaReachedException;
 import de.caritas.cob.uploadservice.api.service.LogService;
+import jakarta.validation.ConstraintViolationException;
 import java.net.UnknownHostException;
-import javax.validation.ConstraintViolationException;
+import java.util.Optional;
 import lombok.NoArgsConstructor;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -16,8 +17,10 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -25,7 +28,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
-import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 /**
@@ -37,18 +39,14 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ApiResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
-  /**
-   * Handles {@link MaxUploadSizeExceededException}.
-   *
-   * @param ex MaxUploadSizeExceededException
-   * @param request WebRequest
-   * @return a {@link ResponseEntity} instance
-   */
-  @ExceptionHandler({MaxUploadSizeExceededException.class})
-  public ResponseEntity<Object> handleCustomBadRequest(
-      final MaxUploadSizeExceededException ex, final WebRequest request) {
+  @Nullable
+  @Override
+  protected ResponseEntity<Object> handleMaxUploadSizeExceededException(
+      MaxUploadSizeExceededException ex,
+      HttpHeaders headers,
+      HttpStatusCode status,
+      WebRequest request) {
     LogService.logWarning(ex);
-
     return handleExceptionInternal(
         ex, null, new HttpHeaders(), HttpStatus.PAYLOAD_TOO_LARGE, request);
   }
@@ -67,21 +65,6 @@ public class ApiResponseEntityExceptionHandler extends ResponseEntityExceptionHa
 
     return handleExceptionInternal(
         ex, null, new HttpHeaders(), HttpStatus.UNSUPPORTED_MEDIA_TYPE, request);
-  }
-
-  /**
-   * Handles {@link MultipartException}.
-   *
-   * @param ex MultipartException
-   * @param request WebRequest
-   * @return a {@link ResponseEntity} instance
-   */
-  @ExceptionHandler({MultipartException.class})
-  public ResponseEntity<Object> handleCustomBadRequest(
-      final MultipartException ex, final WebRequest request) {
-    LogService.logWarning(ex);
-
-    return handleExceptionInternal(ex, null, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
   }
 
   /**
@@ -104,7 +87,7 @@ public class ApiResponseEntityExceptionHandler extends ResponseEntityExceptionHa
    *
    * @param ex HttpMessageNotReadableException
    * @param headers HttpHeaders
-   * @param status HttpStatus
+   * @param statusCode HttpStatusCode
    * @param request WebRequest
    * @return a ResponseEntity instance
    */
@@ -112,8 +95,10 @@ public class ApiResponseEntityExceptionHandler extends ResponseEntityExceptionHa
   protected ResponseEntity<Object> handleHttpMessageNotReadable(
       final HttpMessageNotReadableException ex,
       final HttpHeaders headers,
-      final HttpStatus status,
+      final HttpStatusCode statusCode,
       final WebRequest request) {
+    HttpStatus status =
+        Optional.ofNullable(HttpStatus.resolve(statusCode.value())).orElse(HttpStatus.BAD_REQUEST);
     LogService.logWarning(status, ex);
 
     return handleExceptionInternal(null, null, headers, status, request);
@@ -124,7 +109,7 @@ public class ApiResponseEntityExceptionHandler extends ResponseEntityExceptionHa
    *
    * @param ex MethodArgumentNotValidException
    * @param headers HttpHeaders
-   * @param status HttpStatus
+   * @param statusCode HttpStatusCode
    * @param request WebRequest
    * @return a ResponseEntity instance
    */
@@ -132,8 +117,10 @@ public class ApiResponseEntityExceptionHandler extends ResponseEntityExceptionHa
   protected ResponseEntity<Object> handleMethodArgumentNotValid(
       final MethodArgumentNotValidException ex,
       final HttpHeaders headers,
-      final HttpStatus status,
+      final HttpStatusCode statusCode,
       final WebRequest request) {
+    HttpStatus status =
+        Optional.ofNullable(HttpStatus.resolve(statusCode.value())).orElse(HttpStatus.BAD_REQUEST);
     LogService.logWarning(status, ex);
 
     return handleExceptionInternal(null, null, headers, status, request);
@@ -164,7 +151,10 @@ public class ApiResponseEntityExceptionHandler extends ResponseEntityExceptionHa
   @ExceptionHandler({HttpClientErrorException.class})
   protected ResponseEntity<Object> handleHttpClientException(
       final HttpClientErrorException ex, final WebRequest request) {
-    LogService.logWarning(ex.getStatusCode(), ex);
+    HttpStatus status =
+        Optional.ofNullable(HttpStatus.resolve(ex.getStatusCode().value()))
+            .orElse(HttpStatus.BAD_REQUEST);
+    LogService.logWarning(status, ex);
 
     return handleExceptionInternal(null, null, new HttpHeaders(), ex.getStatusCode(), request);
   }
@@ -178,11 +168,11 @@ public class ApiResponseEntityExceptionHandler extends ResponseEntityExceptionHa
    */
   @ExceptionHandler(
       value = {
-          NullPointerException.class,
-          IllegalArgumentException.class,
-          IllegalStateException.class,
-          KeycloakException.class,
-          UnknownHostException.class
+        NullPointerException.class,
+        IllegalArgumentException.class,
+        IllegalStateException.class,
+        KeycloakException.class,
+        UnknownHostException.class
       })
   public ResponseEntity<Object> handleInternal(
       final RuntimeException ex, final WebRequest request) {
@@ -216,12 +206,11 @@ public class ApiResponseEntityExceptionHandler extends ResponseEntityExceptionHa
    * @return a ResponseEntity instance
    */
   @ExceptionHandler(QuotaReachedException.class)
-  public ResponseEntity<Object> handleInternal(final QuotaReachedException ex,
-      final WebRequest request) {
+  public ResponseEntity<Object> handleInternal(
+      final QuotaReachedException ex, final WebRequest request) {
     ex.executeLogging();
 
-    return handleExceptionInternal(null, null, QUOTA_REACHED.buildHeader(), HttpStatus.FORBIDDEN,
-        request);
+    return handleExceptionInternal(
+        null, null, QUOTA_REACHED.buildHeader(), HttpStatus.FORBIDDEN, request);
   }
-
 }

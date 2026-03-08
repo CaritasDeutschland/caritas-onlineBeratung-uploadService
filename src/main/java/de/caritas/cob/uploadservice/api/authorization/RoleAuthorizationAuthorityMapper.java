@@ -9,9 +9,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.stereotype.Component;
 
-/**
- * Own implementation of the Spring GrantedAuthoritiesMapper.
- */
+/** Own implementation of the Spring GrantedAuthoritiesMapper. */
 @Component
 public class RoleAuthorizationAuthorityMapper implements GrantedAuthoritiesMapper {
 
@@ -27,11 +25,10 @@ public class RoleAuthorizationAuthorityMapper implements GrantedAuthoritiesMappe
     return mapAuthorities(roleNames);
   }
 
-  private Set<GrantedAuthority> mapAuthorities(Set<String> roleNames) {
+  public Set<GrantedAuthority> mapAuthorities(Set<String> roleNames) {
     return roleNames.parallelStream()
         .map(UserRole::getRoleByValue)
-        .filter(Optional::isPresent)
-        .map(Optional::get)
+        .flatMap(Optional::stream)
         .map(Authority::getAuthoritiesByUserRole)
         .flatMap(Collection::parallelStream)
         .map(SimpleGrantedAuthority::new)

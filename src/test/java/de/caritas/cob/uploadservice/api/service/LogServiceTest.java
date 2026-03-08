@@ -7,41 +7,39 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.powermock.reflect.Whitebox.setInternalState;
 
 import java.io.PrintWriter;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.util.ReflectionTestUtils;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class LogServiceTest {
 
   private static final String ERROR_MESSAGE = "error";
   private static final String RC_SERVICE_ERROR_TEXT = "Rocket.Chat service error: ";
   private static final String INTERNAL_SERVER_ERROR_TEXT = "Internal Server Error: ";
   private static final String BAD_REQUEST_TEXT = "Bad Request: ";
-  private static final String STATISTICS_EVENT_PROCESSING_ERROR = "StatisticsEventProcessing error: ";
-  private static final String STATISTICS_EVENT_PROCESSING_WARNING = "StatisticsEventProcessing warning: ";
+  private static final String STATISTICS_EVENT_PROCESSING_ERROR =
+      "StatisticsEventProcessing error: ";
+  private static final String STATISTICS_EVENT_PROCESSING_WARNING =
+      "StatisticsEventProcessing warning: ";
 
-  @Mock
-  Exception exception;
+  @Mock Exception exception;
 
-  @Mock
-  private Logger logger;
+  @Mock private Logger logger;
 
-  @Before
+  @BeforeEach
   public void setup() {
-    setInternalState(LogService.class, "LOGGER", logger);
+    ReflectionTestUtils.setField(LogService.class, "LOGGER", logger);
   }
 
-  /**
-   * Tests for method: logRocketChatServiceError
-   */
+  /** Tests for method: logRocketChatServiceError */
   @Test
   public void logRocketChatServiceError_Should_LogExceptionStackTrace() {
 
@@ -53,22 +51,18 @@ public class LogServiceTest {
   public void logRocketChatServiceError_Should_LogErrorMessage() {
 
     LogService.logRocketChatServiceError(ERROR_MESSAGE);
-    verify(logger, times(1)).error(RC_SERVICE_ERROR_TEXT + "{}",
-        ERROR_MESSAGE);
+    verify(logger, times(1)).error(RC_SERVICE_ERROR_TEXT + "{}", ERROR_MESSAGE);
   }
 
   @Test
   public void logRocketChatServiceError_Should_LogErrorMessageAndExceptionStackTrace() {
 
     LogService.logRocketChatServiceError(ERROR_MESSAGE, exception);
-    verify(logger, times(1)).error(RC_SERVICE_ERROR_TEXT + "{}",
-        ERROR_MESSAGE);
+    verify(logger, times(1)).error(RC_SERVICE_ERROR_TEXT + "{}", ERROR_MESSAGE);
     verify(exception, atLeastOnce()).printStackTrace(any(PrintWriter.class));
   }
 
-  /**
-   * Tests for method: logUserServiceHelperError
-   */
+  /** Tests for method: logUserServiceHelperError */
   @Test
   public void logUserServiceHelperError_Should_LogExceptionStackTrace() {
 
@@ -76,9 +70,7 @@ public class LogServiceTest {
     verify(exception, atLeastOnce()).printStackTrace(any(PrintWriter.class));
   }
 
-  /**
-   * Tests for method: logInfo
-   */
+  /** Tests for method: logInfo */
   @Test
   public void logInfo_Should_LogMessage() {
 
@@ -86,9 +78,7 @@ public class LogServiceTest {
     verify(logger, times(1)).info(ERROR_MESSAGE);
   }
 
-  /**
-   * Tests for method: logInfo
-   */
+  /** Tests for method: logInfo */
   @Test
   public void logInfo_Should_LogExceptionStackTrace() {
 
@@ -96,9 +86,7 @@ public class LogServiceTest {
     verify(logger, times(1)).info(getStackTrace(exception));
   }
 
-  /**
-   * Tests for method: logEncryptionServiceError
-   */
+  /** Tests for method: logEncryptionServiceError */
   @Test
   public void logEncryptionServiceError_Should_LogExceptionStackTrace() {
 
@@ -106,9 +94,7 @@ public class LogServiceTest {
     verify(exception, atLeastOnce()).printStackTrace(any(PrintWriter.class));
   }
 
-  /**
-   * Tests for method: logRocketChatBadRequestError
-   */
+  /** Tests for method: logRocketChatBadRequestError */
   @Test
   public void logRocketChatBadRequestError_Should_LogExceptionStackTrace() {
 
@@ -116,15 +102,12 @@ public class LogServiceTest {
     verify(exception, atLeastOnce()).printStackTrace(any(PrintWriter.class));
   }
 
-  /**
-   * Tests for method: logInternalServerError
-   */
+  /** Tests for method: logInternalServerError */
   @Test
   public void logInternalServerError_Should_LogErrorMessageAndExceptionStackTrace() {
 
     LogService.logInternalServerError(ERROR_MESSAGE, exception);
-    verify(logger, times(1))
-        .error(anyString(), eq(INTERNAL_SERVER_ERROR_TEXT), eq(ERROR_MESSAGE));
+    verify(logger, times(1)).error(anyString(), eq(INTERNAL_SERVER_ERROR_TEXT), eq(ERROR_MESSAGE));
     verify(exception, atLeastOnce()).printStackTrace(any(PrintWriter.class));
   }
 
@@ -136,15 +119,12 @@ public class LogServiceTest {
     verify(exception, atLeastOnce()).printStackTrace(any(PrintWriter.class));
   }
 
-  /**
-   * Tests for method: logInfo
-   */
+  /** Tests for method: logInfo */
   @Test
   public void logBadRequest_Should_LogMessage() {
 
     LogService.logBadRequest(ERROR_MESSAGE);
-    verify(logger, times(1)).error(BAD_REQUEST_TEXT + "{}",
-        ERROR_MESSAGE);
+    verify(logger, times(1)).error(BAD_REQUEST_TEXT + "{}", ERROR_MESSAGE);
   }
 
   @Test
@@ -160,8 +140,8 @@ public class LogServiceTest {
 
     LogService.logWarning(HttpStatus.ACCEPTED, exception);
     verify(exception, atLeastOnce()).printStackTrace(any(PrintWriter.class));
-    verify(logger, times(1)).warn(anyString(), eq(HttpStatus.ACCEPTED.getReasonPhrase()),
-        anyString());
+    verify(logger, times(1))
+        .warn(anyString(), eq(HttpStatus.ACCEPTED.getReasonPhrase()), anyString());
   }
 
   @Test
@@ -183,8 +163,7 @@ public class LogServiceTest {
   public void logStatisticEventError_Should_LogExceptionStackTraceAndErrorMessage() {
 
     LogService.logStatisticsEventError(exception);
-    verify(logger, times(1))
-        .error(anyString(), eq(STATISTICS_EVENT_PROCESSING_ERROR), anyString());
+    verify(logger, times(1)).error(anyString(), eq(STATISTICS_EVENT_PROCESSING_ERROR), anyString());
     verify(exception, atLeastOnce()).printStackTrace(any(PrintWriter.class));
   }
 

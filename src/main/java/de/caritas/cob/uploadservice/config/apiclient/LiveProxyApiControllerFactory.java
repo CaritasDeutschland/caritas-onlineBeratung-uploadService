@@ -12,8 +12,8 @@ public class LiveProxyApiControllerFactory {
 
   @Value("${user.service.api.liveproxy.url}")
   private String liveProxyApiUrl;
-  @Autowired
-  private RestTemplate restTemplate;
+
+  @Autowired private RestTemplate restTemplate;
 
   public LiveproxyControllerApi createControllerApi() {
     var apiClient = new ApiClient(restTemplate).setBasePath(this.liveProxyApiUrl);

@@ -100,7 +100,7 @@ public class RocketChatService {
 
     } else {
       LogService.logRocketChatServiceError(
-          String.format("Could not set messages as read for system user in group %s", rcGroupId));
+          "Could not set messages as read for system user in group %s".formatted(rcGroupId));
     }
   }
 
@@ -110,8 +110,7 @@ public class RocketChatService {
     try {
       HttpHeaders headers = getRocketChatHeader(rcToken, rcUserId);
       PostGroupAsReadDto postGroupAsReadDto = new PostGroupAsReadDto(rcGroupId);
-      HttpEntity<PostGroupAsReadDto> request =
-          new HttpEntity<>(postGroupAsReadDto, headers);
+      HttpEntity<PostGroupAsReadDto> request = new HttpEntity<>(postGroupAsReadDto, headers);
 
       restTemplate.postForObject(rcPostGroupMessagesRead, request, StandardResponseDto.class);
     } catch (Exception ex) {
@@ -142,8 +141,7 @@ public class RocketChatService {
       MultiValueMap<String, Object> map =
           getParameterMapForUploadRequest(
               rocketChatUploadParameter, rocketChatCredentials.getRocketChatUserId());
-      HttpEntity<MultiValueMap<String, Object>> request =
-          new HttpEntity<>(map, headers);
+      HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(map, headers);
 
       response = restTemplate.postForObject(uploadUrl, request, FullUploadResponseDto.class);
 
@@ -192,7 +190,8 @@ public class RocketChatService {
       throw new InternalServerErrorException(
           String.format(
               "Could not access file to upload to room with id %s for user with id %s",
-              rocketChatUploadParameter.getRoomId(), rcUserId), ex,
+              rocketChatUploadParameter.getRoomId(), rcUserId),
+          ex,
           LogService::logInternalServerError);
     }
 

@@ -31,15 +31,14 @@ import static de.caritas.cob.uploadservice.helper.TestConstants.STANDARD_SUCCESS
 import static de.caritas.cob.uploadservice.helper.TestConstants.UNSANITIZED_UPLOAD_FILE;
 import static de.caritas.cob.uploadservice.helper.TestConstants.UPLOAD_FILE;
 import static org.assertj.core.api.Assertions.fail;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.powermock.reflect.Whitebox.setInternalState;
 
 import de.caritas.cob.uploadservice.api.container.RocketChatCredentials;
 import de.caritas.cob.uploadservice.api.container.RocketChatUploadParameter;
@@ -53,16 +52,16 @@ import de.caritas.cob.uploadservice.api.model.rocket.chat.UploadResponseDto;
 import de.caritas.cob.uploadservice.api.service.helper.RocketChatCredentialsHelper;
 import de.caritas.cob.uploadservice.rocketchat.generated.web.model.FullUploadResponseDto;
 import java.nio.charset.StandardCharsets;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -75,22 +74,16 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartException;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class RocketChatServiceTest {
 
-  @InjectMocks
-  private RocketChatService rocketChatService;
-  @Mock
-  private RocketChatCredentialsHelper rcCredentialsHelper;
-  @Mock
-  private RestTemplate restTemplate;
-  @Mock
-  private Logger logger;
-  @Mock
-  private UploadErrorHelper uploadErrorHelper;
+  @InjectMocks private RocketChatService rocketChatService;
+  @Mock private RocketChatCredentialsHelper rcCredentialsHelper;
+  @Mock private RestTemplate restTemplate;
+  @Mock private Logger logger;
+  @Mock private UploadErrorHelper uploadErrorHelper;
 
-  @Captor
-  private ArgumentCaptor<HttpEntity<MultiValueMap<String, Object>>> mapArgumentCaptor;
+  @Captor private ArgumentCaptor<HttpEntity<MultiValueMap<String, Object>>> mapArgumentCaptor;
 
   private RocketChatCredentials rocketChatCredentials;
   private RocketChatUploadParameter rocketChatUploadParameter;
@@ -98,15 +91,18 @@ public class RocketChatServiceTest {
 
   @InjectMocks private EmailNotificationFacade emailNotificationFacade;
 
-  /**
-   * Setup method.
-   */
-  @Before
+  /** Setup method. */
+  @BeforeEach
   public void setup() throws NoSuchFieldException, SecurityException {
-    ReflectionTestUtils.setField(emailNotificationFacade, FIELD_NAME_RC_HEADER_AUTH_TOKEN, RC_TOKEN);
+    ReflectionTestUtils.setField(
+        emailNotificationFacade, FIELD_NAME_RC_HEADER_AUTH_TOKEN, RC_TOKEN);
     ReflectionTestUtils.setField(emailNotificationFacade, FIELD_NAME_RC_HEADER_USER_ID, RC_USER_ID);
-    ReflectionTestUtils.setField(emailNotificationFacade, FIELD_NAME_RC_POST_GROUP_MESSAGES_READ, FIELD_VALUE_RC_POST_GROUP_MESSAGES_READ);
-    ReflectionTestUtils.setField(emailNotificationFacade, FIELD_NAME_RC_ROOMS_UPLOAD_URL, FIELD_VALUE_RC_ROOMS_UPLOAD_URL);
+    ReflectionTestUtils.setField(
+        emailNotificationFacade,
+        FIELD_NAME_RC_POST_GROUP_MESSAGES_READ,
+        FIELD_VALUE_RC_POST_GROUP_MESSAGES_READ);
+    ReflectionTestUtils.setField(
+        emailNotificationFacade, FIELD_NAME_RC_ROOMS_UPLOAD_URL, FIELD_VALUE_RC_ROOMS_UPLOAD_URL);
 
     rocketChatCredentials =
         RocketChatCredentials.builder()
@@ -131,29 +127,28 @@ public class RocketChatServiceTest {
             .roomId(RC_ROOM_ID)
             .tmId(RC_TMID)
             .build();
-
-    setInternalState(LogService.class, "LOGGER", logger);
   }
 
   /* Method: markGroupAsReadForSystemUser */
   @Test
-  public void markGroupAsReadForSystemUser_Should_ThrowRocketChatPostMarkGroupAsReadException_WhenMarkGroupAsReadFails()
-      throws Exception {
+  public void
+      markGroupAsReadForSystemUser_Should_ThrowRocketChatPostMarkGroupAsReadException_WhenMarkGroupAsReadFails()
+          throws Exception {
 
     when(rcCredentialsHelper.getSystemUser()).thenReturn(RC_SYSTEM_USER);
 
     RestClientException ex = new RestClientException(ERROR_MSG);
     when(restTemplate.postForObject(
-        ArgumentMatchers.anyString(),
-        any(),
-        ArgumentMatchers.<Class<StandardResponseDto>>any()))
+            ArgumentMatchers.anyString(),
+            any(),
+            ArgumentMatchers.<Class<StandardResponseDto>>any()))
         .thenThrow(ex);
 
     try {
       rocketChatService.markGroupAsReadForSystemUser(RC_ROOM_ID);
       fail("Expected exception: RocketChatPostMarkGroupAsReadException");
     } catch (RocketChatPostMarkGroupAsReadException rocketChatPostMarkGroupAsReadException) {
-      assertTrue("Expected RocketChatPostMarkGroupAsReadException thrown", true);
+      assertTrue(true, "Expected RocketChatPostMarkGroupAsReadException thrown");
     }
   }
 
@@ -164,9 +159,9 @@ public class RocketChatServiceTest {
     when(rcCredentialsHelper.getSystemUser()).thenReturn(RC_SYSTEM_USER);
 
     when(restTemplate.postForObject(
-        ArgumentMatchers.anyString(),
-        any(),
-        ArgumentMatchers.<Class<StandardResponseDto>>any()))
+            ArgumentMatchers.anyString(),
+            any(),
+            ArgumentMatchers.<Class<StandardResponseDto>>any()))
         .thenReturn(STANDARD_SUCCESS_RESPONSE_DTO);
 
     rocketChatService.markGroupAsReadForSystemUser(RC_ROOM_ID);
@@ -175,8 +170,9 @@ public class RocketChatServiceTest {
   }
 
   @Test
-  public void markGroupAsReadForSystemUser_Should_LogError_WhenProvidedWithInvalidRChatSysUserCredentials()
-      throws Exception {
+  public void
+      markGroupAsReadForSystemUser_Should_LogError_WhenProvidedWithInvalidRChatSysUserCredentials()
+          throws Exception {
 
     when(rcCredentialsHelper.getSystemUser()).thenReturn(INVALID_RC_SYSTEM_USER);
 
@@ -186,7 +182,8 @@ public class RocketChatServiceTest {
 
   /* Method: roomsUpload */
   @Test
-  public void roomsUpload_Should_ThrowMaxUploadSizeExceededException_WhenRcErrorTypeIsFileTooLarge() {
+  public void
+      roomsUpload_Should_ThrowMaxUploadSizeExceededException_WhenRcErrorTypeIsFileTooLarge() {
 
     HttpStatusCodeException httpStatusCodeException =
         new HttpServerErrorException(
@@ -195,25 +192,23 @@ public class RocketChatServiceTest {
             RC_UPLOAD_ERROR_RESPONSE_BODY_ENTITY_TOO_LARGE.getBytes(),
             StandardCharsets.UTF_8);
     when(restTemplate.postForObject(
-        ArgumentMatchers.anyString(),
-        any(),
-        ArgumentMatchers.<Class<UploadResponseDto>>any()))
+            ArgumentMatchers.anyString(), any(), ArgumentMatchers.<Class<UploadResponseDto>>any()))
         .thenThrow(httpStatusCodeException);
 
     when(uploadErrorHelper.getParsedErrorResponse(
-        httpStatusCodeException.getResponseBodyAsString()))
+            httpStatusCodeException.getResponseBodyAsString()))
         .thenReturn(RC_UPLOAD_ERROR_RESPONSE_DTO_ENTITY_TOO_LARGE);
     when(uploadErrorHelper.getErrorFromUploadResponse(
-        Mockito.eq(RC_UPLOAD_ERROR_RESPONSE_DTO_ENTITY_TOO_LARGE),
-        Mockito.anyString(),
-        Mockito.anyString()))
+            Mockito.eq(RC_UPLOAD_ERROR_RESPONSE_DTO_ENTITY_TOO_LARGE),
+            Mockito.anyString(),
+            Mockito.anyString()))
         .thenReturn(RC_UPLOAD_ERROR_ENTITY_TOO_LARGE);
 
     try {
       rocketChatService.roomsUpload(rocketChatCredentials, rocketChatUploadParameter);
       fail("Expected exception: MaxUploadSizeExceededException");
     } catch (MaxUploadSizeExceededException maxUploadSizeExceededException) {
-      assertTrue("Expected MaxUploadSizeExceededException thrown", true);
+      assertTrue(true, "Expected MaxUploadSizeExceededException thrown");
     }
   }
 
@@ -227,25 +222,23 @@ public class RocketChatServiceTest {
             RC_UPLOAD_ERROR_RESPONSE_BODY_INVALID_FILE_TYPE.getBytes(),
             StandardCharsets.UTF_8);
     when(restTemplate.postForObject(
-        ArgumentMatchers.anyString(),
-        any(),
-        ArgumentMatchers.<Class<UploadResponseDto>>any()))
+            ArgumentMatchers.anyString(), any(), ArgumentMatchers.<Class<UploadResponseDto>>any()))
         .thenThrow(httpStatusCodeException);
 
     when(uploadErrorHelper.getParsedErrorResponse(
-        httpStatusCodeException.getResponseBodyAsString()))
+            httpStatusCodeException.getResponseBodyAsString()))
         .thenReturn(RC_UPLOAD_ERROR_RESPONSE_DTO_INVALID_FILE_TYPE);
     when(uploadErrorHelper.getErrorFromUploadResponse(
-        Mockito.eq(RC_UPLOAD_ERROR_RESPONSE_DTO_INVALID_FILE_TYPE),
-        Mockito.anyString(),
-        Mockito.anyString()))
+            Mockito.eq(RC_UPLOAD_ERROR_RESPONSE_DTO_INVALID_FILE_TYPE),
+            Mockito.anyString(),
+            Mockito.anyString()))
         .thenReturn(RC_UPLOAD_ERROR_INVALID_FILE_TYPE);
 
     try {
       rocketChatService.roomsUpload(rocketChatCredentials, rocketChatUploadParameter);
       fail("Expected exception: InvalidFileTypeException");
     } catch (InvalidFileTypeException invalidFileTypeException) {
-      assertTrue("Expected InvalidFileTypeException thrown", true);
+      assertTrue(true, "Expected InvalidFileTypeException thrown");
     }
   }
 
@@ -259,25 +252,23 @@ public class RocketChatServiceTest {
             RC_UPLOAD_ERROR_RESPONSE_BODY_UNKNOWN_ERROR.getBytes(),
             StandardCharsets.UTF_8);
     when(restTemplate.postForObject(
-        ArgumentMatchers.anyString(),
-        any(),
-        ArgumentMatchers.<Class<UploadResponseDto>>any()))
+            ArgumentMatchers.anyString(), any(), ArgumentMatchers.<Class<UploadResponseDto>>any()))
         .thenThrow(httpStatusCodeException);
 
     when(uploadErrorHelper.getParsedErrorResponse(
-        httpStatusCodeException.getResponseBodyAsString()))
+            httpStatusCodeException.getResponseBodyAsString()))
         .thenReturn(RC_UPLOAD_ERROR_RESPONSE_DTO_UNKNOWN_ERROR);
     when(uploadErrorHelper.getErrorFromUploadResponse(
-        Mockito.eq(RC_UPLOAD_ERROR_RESPONSE_DTO_UNKNOWN_ERROR),
-        Mockito.anyString(),
-        Mockito.anyString()))
+            Mockito.eq(RC_UPLOAD_ERROR_RESPONSE_DTO_UNKNOWN_ERROR),
+            Mockito.anyString(),
+            Mockito.anyString()))
         .thenReturn(RC_UPLOAD_ERROR_UNKNOWN_ERROR);
 
     try {
       rocketChatService.roomsUpload(rocketChatCredentials, rocketChatUploadParameter);
       fail("Expected exception: MultipartException");
     } catch (MultipartException multipartException) {
-      assertTrue("Expected MultipartException thrown", true);
+      assertTrue(true, "Expected MultipartException thrown");
     }
   }
 
@@ -285,16 +276,16 @@ public class RocketChatServiceTest {
   public void roomsUpload_Should_ThrowMultipartException_WhenResponseIsNotSuccess() {
 
     when(restTemplate.postForObject(
-        ArgumentMatchers.anyString(),
-        any(),
-        ArgumentMatchers.<Class<FullUploadResponseDto>>any()))
+            ArgumentMatchers.anyString(),
+            any(),
+            ArgumentMatchers.<Class<FullUploadResponseDto>>any()))
         .thenReturn(RC_FULL_UPLOAD_ERROR_RESPONSE_DTO_UNKNOWN_ERROR);
 
     try {
       rocketChatService.roomsUpload(rocketChatCredentials, rocketChatUploadParameter);
       fail("Expected exception: MultipartException");
     } catch (MultipartException multipartException) {
-      assertTrue("Expected MultipartException thrown", true);
+      assertTrue(true, "Expected MultipartException thrown");
     }
   }
 
@@ -302,16 +293,14 @@ public class RocketChatServiceTest {
   public void roomsUpload_Should_ThrowMultipartException_WhenResponseIsNull() {
 
     when(restTemplate.postForObject(
-        ArgumentMatchers.anyString(),
-        any(),
-        ArgumentMatchers.<Class<UploadResponseDto>>any()))
+            ArgumentMatchers.anyString(), any(), ArgumentMatchers.<Class<UploadResponseDto>>any()))
         .thenReturn(null);
 
     try {
       rocketChatService.roomsUpload(rocketChatCredentials, rocketChatUploadParameter);
       fail("Expected exception: MultipartException");
     } catch (MultipartException multipartException) {
-      assertTrue("Expected MultipartException thrown", true);
+      assertTrue(true, "Expected MultipartException thrown");
     }
   }
 
@@ -319,9 +308,9 @@ public class RocketChatServiceTest {
   public void roomsUpload_Should_NotThrowException_WhenResponseIsSuccess() {
 
     when(restTemplate.postForObject(
-        ArgumentMatchers.anyString(),
-        any(),
-        ArgumentMatchers.<Class<FullUploadResponseDto>>any()))
+            ArgumentMatchers.anyString(),
+            any(),
+            ArgumentMatchers.<Class<FullUploadResponseDto>>any()))
         .thenReturn(RC_FULL_UPLOAD_ERROR_RESPONSE_DTO_SUCCESS);
 
     try {
@@ -335,19 +324,22 @@ public class RocketChatServiceTest {
   public void roomsUpload_Should_UploadFileWithSanitizedFileName() {
 
     when(restTemplate.postForObject(
-        ArgumentMatchers.anyString(),
-        any(),
-        ArgumentMatchers.<Class<FullUploadResponseDto>>any()))
+            ArgumentMatchers.anyString(),
+            any(),
+            ArgumentMatchers.<Class<FullUploadResponseDto>>any()))
         .thenReturn(RC_FULL_UPLOAD_ERROR_RESPONSE_DTO_SUCCESS);
 
-    rocketChatService
-        .roomsUpload(rocketChatCredentials, rocketChatUploadParameterWithUnsanitizedFileName);
+    rocketChatService.roomsUpload(
+        rocketChatCredentials, rocketChatUploadParameterWithUnsanitizedFileName);
 
-    verify(restTemplate).postForObject(ArgumentMatchers.anyString(), mapArgumentCaptor.capture(),
-        ArgumentMatchers.<Class<Void>>any());
+    verify(restTemplate)
+        .postForObject(
+            ArgumentMatchers.anyString(),
+            mapArgumentCaptor.capture(),
+            ArgumentMatchers.<Class<Void>>any());
 
-    MultipartInputStreamFileResource file = (MultipartInputStreamFileResource) mapArgumentCaptor
-        .getValue().getBody().get(null).get(3);
+    MultipartInputStreamFileResource file =
+        (MultipartInputStreamFileResource) mapArgumentCaptor.getValue().getBody().get(null).get(3);
     assertEquals(FILE_NAME_SANITIZED, file.getFilename());
   }
 }

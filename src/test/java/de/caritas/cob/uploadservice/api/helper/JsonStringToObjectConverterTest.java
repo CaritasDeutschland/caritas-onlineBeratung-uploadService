@@ -2,32 +2,31 @@ package de.caritas.cob.uploadservice.api.helper;
 
 import static de.caritas.cob.uploadservice.helper.TestConstants.INVALID_JSON_BODY;
 import static de.caritas.cob.uploadservice.helper.TestConstants.RC_UPLOAD_ERROR_RESPONSE_BODY;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.powermock.reflect.Whitebox.setInternalState;
 
 import de.caritas.cob.uploadservice.api.model.rocket.chat.UploadResponseDto;
 import de.caritas.cob.uploadservice.api.service.LogService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
+import org.springframework.test.util.ReflectionTestUtils;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class JsonStringToObjectConverterTest {
 
   @Mock private Logger logger;
 
-  @Before
+  @BeforeEach
   public void setup() {
-    setInternalState(LogService.class, "LOGGER", logger);
+    ReflectionTestUtils.setField(LogService.class, "LOGGER", logger);
   }
 
   @Test

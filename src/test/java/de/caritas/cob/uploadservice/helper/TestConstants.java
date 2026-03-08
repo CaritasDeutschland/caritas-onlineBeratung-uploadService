@@ -47,11 +47,13 @@ public class TestConstants {
   public static final String RC_TMID = "jkadsjk833";
   public static final String RC_TMID_WITH_HTML = "<strong>jkadsjk833";
   public static final String RC_UPLOAD_ERROR_RESPONSE_BODY =
-      "{\n"
-          + "    \"success\": false,\n"
-          + "    \"error\": \"Invalid room [error-invalid-room]\",\n"
-          + "    \"errorType\": \"error-invalid-room\"\n"
-          + "}";
+      """
+          {
+              "success": false,
+              "error": "Invalid room [error-invalid-room]",
+              "errorType": "error-invalid-room"
+          }\
+          """;
   public static final String RC_TOKEN_HEADER_PARAMETER_NAME = "RCToken";
   public static final String RC_USER_ID_HEADER_PARAMETER_NAME = "RCUserId";
   public static final String RC_TOKEN = "2fUGwNSqvpiEDTsMJQ54XeYdx0XzzCWdu0PP0lXFNu8";
@@ -155,8 +157,10 @@ public class TestConstants {
   public static final String FORM_PARAM_FILE_HEADER_EMPTY = "";
   public static final String FORM_PARAM_TYPE = "t";
   public static final String FORM_PARAM_TYPE_EMPTY = "";
-  public static final String FILE_NAME_UNSANITIZED = "äöüßÄÖÜt!\"e...~´´`::.jpg;.jpg;st-+_#$1.jpg.doc";
-  public static final String FILE_NAME_UNSANITIZED_WITH_SPACES = "   äöüßÄÖÜt!\"e ...~´´`::.jpg;.jpg;st-+_#$1.jpg.doc  ";
+  public static final String FILE_NAME_UNSANITIZED =
+      "äöüßÄÖÜt!\"e...~´´`::.jpg;.jpg;st-+_#$1.jpg.doc";
+  public static final String FILE_NAME_UNSANITIZED_WITH_SPACES =
+      "   äöüßÄÖÜt!\"e ...~´´`::.jpg;.jpg;st-+_#$1.jpg.doc  ";
   public static final String FILE_NAME_SANITIZED = "äöüßÄÖÜtejpgjpgst-+#1jpg.doc";
   public static final String FILE_NAME_SANITIZED_WITH_SPACES = "äöüßÄÖÜte jpgjpgst-+#1jpg.doc";
   public static final String FILE_NAME_ONLY_SPECIAL_CHARS = "!...~´´`.;;;§%%%_$.jpg";
@@ -164,6 +168,6 @@ public class TestConstants {
   public static final MockMultipartFile UPLOAD_FILE =
       new MockMultipartFile("uploadFile", "uploadFile.txt", "text/plain", "content".getBytes());
   public static final MockMultipartFile UNSANITIZED_UPLOAD_FILE =
-      new MockMultipartFile("uploadFile", FILE_NAME_UNSANITIZED, "text/plain",
-          "content".getBytes());
+      new MockMultipartFile(
+          "uploadFile", FILE_NAME_UNSANITIZED, "text/plain", "content".getBytes());
 }

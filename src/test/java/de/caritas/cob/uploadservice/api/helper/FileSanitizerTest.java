@@ -6,13 +6,13 @@ import static de.caritas.cob.uploadservice.helper.TestConstants.FILE_NAME_SANITI
 import static de.caritas.cob.uploadservice.helper.TestConstants.FILE_NAME_SANITIZED_WITH_SPACES;
 import static de.caritas.cob.uploadservice.helper.TestConstants.FILE_NAME_UNSANITIZED;
 import static de.caritas.cob.uploadservice.helper.TestConstants.FILE_NAME_UNSANITIZED_WITH_SPACES;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class FileSanitizerTest {
 
   @Test
@@ -22,7 +22,8 @@ public class FileSanitizerTest {
 
   @Test
   public void sanitizeFileName_Should_RemoveLeadingAndTrailingSpacesFromFilename() {
-    assertEquals(FILE_NAME_SANITIZED_WITH_SPACES,
+    assertEquals(
+        FILE_NAME_SANITIZED_WITH_SPACES,
         FileSanitizer.sanitizeFileName(FILE_NAME_UNSANITIZED_WITH_SPACES));
   }
 

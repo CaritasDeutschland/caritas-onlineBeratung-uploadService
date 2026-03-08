@@ -31,7 +31,7 @@ public class TempCleanupAspect {
 
   /**
    * Resolve {@link MultipartHttpServletRequest} from the current {@link
-   * javax.servlet.http.HttpServletRequest}
+   * jakarta.servlet.http.HttpServletRequest}
    *
    * @return a MultipartHttpServletRequest instance
    */

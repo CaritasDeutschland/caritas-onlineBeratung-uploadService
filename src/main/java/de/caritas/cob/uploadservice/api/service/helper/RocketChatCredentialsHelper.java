@@ -7,7 +7,6 @@ import de.caritas.cob.uploadservice.api.model.rocket.chat.login.LoginResponseDto
 import de.caritas.cob.uploadservice.api.model.rocket.chat.logout.LogoutResponseDto;
 import de.caritas.cob.uploadservice.api.service.LogService;
 import java.time.LocalDateTime;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -157,13 +156,12 @@ public class RocketChatCredentialsHelper {
       map.add("username", username);
       map.add("password", password);
 
-      HttpEntity<MultiValueMap<String, String>> request =
-          new HttpEntity<>(map, headers);
+      HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
 
       return restTemplate.postForEntity(rocketChatApiUserLogin, request, LoginResponseDto.class);
     } catch (Exception ex) {
       LogService.logRocketChatServiceError(
-          String.format("Could not login user (%s) in Rocket.Chat", username), ex);
+          "Could not login user (%s) in Rocket.Chat".formatted(username), ex);
       throw new RocketChatLoginException(ex);
     }
   }
@@ -189,7 +187,7 @@ public class RocketChatCredentialsHelper {
 
     } catch (Exception ex) {
       LogService.logRocketChatServiceError(
-          String.format("Could not log out user id (%s) from Rocket.Chat", rcUserId), ex);
+          "Could not log out user id (%s) from Rocket.Chat".formatted(rcUserId), ex);
 
       return false;
     }
@@ -215,7 +213,7 @@ public class RocketChatCredentialsHelper {
   private HttpHeaders getStandardHttpHeaders(String rcToken, String rcUserId) {
 
     HttpHeaders httpHeaders = new HttpHeaders();
-    httpHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
+    httpHeaders.setContentType(MediaType.APPLICATION_JSON);
     httpHeaders.add(rocketChatHeaderAuthToken, rcToken);
     httpHeaders.add(rocketChatHeaderUserId, rcUserId);
     return httpHeaders;

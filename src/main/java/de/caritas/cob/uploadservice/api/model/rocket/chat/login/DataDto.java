@@ -11,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DataDto {
+
   private String userId;
   private String authToken;
   private MeDto me;

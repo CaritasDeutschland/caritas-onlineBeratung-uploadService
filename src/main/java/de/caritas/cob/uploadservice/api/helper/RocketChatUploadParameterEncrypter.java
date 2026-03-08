@@ -3,7 +3,6 @@ package de.caritas.cob.uploadservice.api.helper;
 import de.caritas.cob.uploadservice.api.container.RocketChatUploadParameter;
 import de.caritas.cob.uploadservice.api.exception.CustomCryptoException;
 import de.caritas.cob.uploadservice.api.service.EncryptionService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -14,7 +13,6 @@ public class RocketChatUploadParameterEncrypter {
 
   private final EncryptionService encryptionService;
 
-  @Autowired
   public RocketChatUploadParameterEncrypter(EncryptionService encryptionService) {
     this.encryptionService = encryptionService;
   }

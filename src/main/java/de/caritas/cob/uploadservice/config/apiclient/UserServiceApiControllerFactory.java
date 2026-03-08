@@ -12,8 +12,8 @@ public class UserServiceApiControllerFactory {
 
   @Value("${user.service.api.url}")
   private String userServiceApiUrl;
-  @Autowired
-  private RestTemplate restTemplate;
+
+  @Autowired private RestTemplate restTemplate;
 
   public UserControllerApi createControllerApi() {
     var apiClient = new ApiClient(restTemplate).setBasePath(this.userServiceApiUrl);

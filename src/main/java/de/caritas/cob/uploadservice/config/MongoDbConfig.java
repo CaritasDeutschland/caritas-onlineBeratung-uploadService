@@ -17,10 +17,8 @@ public class MongoDbConfig {
   @Bean
   public MongoClient mongoClient() {
     final ConnectionString connectionString = new ConnectionString(mongoUri);
-    final MongoClientSettings mongoClientSettings = MongoClientSettings.builder()
-        .applyConnectionString(connectionString)
-        .build();
+    final MongoClientSettings mongoClientSettings =
+        MongoClientSettings.builder().applyConnectionString(connectionString).build();
     return MongoClients.create(mongoClientSettings);
   }
-
 }

@@ -9,7 +9,6 @@ import de.caritas.cob.uploadservice.userservice.generated.ApiClient;
 import de.caritas.cob.uploadservice.userservice.generated.web.model.NewMessageNotificationDTO;
 import java.util.Optional;
 import java.util.function.Consumer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -25,8 +24,8 @@ public class EmailNotificationHelper {
   private final TenantHeaderSupplier tenantHeaderSupplier;
   private final UserServiceApiControllerFactory userServiceApiControllerFactory;
 
-  @Autowired
-  public EmailNotificationHelper(ServiceHelper serviceHelper,
+  public EmailNotificationHelper(
+      ServiceHelper serviceHelper,
       TenantHeaderSupplier tenantHeaderSupplier,
       UserServiceApiControllerFactory userServiceApiControllerFactory) {
     this.serviceHelper = serviceHelper;
@@ -42,8 +41,7 @@ public class EmailNotificationHelper {
    */
   @Async
   public void sendEmailNotificationViaUserService(
-      String rcGroupId, String accessToken,
-      Optional<Long> currentTenant) {
+      String rcGroupId, String accessToken, Optional<Long> currentTenant) {
     var userControllerApi = userServiceApiControllerFactory.createControllerApi();
     addDefaultHeaders(userControllerApi.getApiClient(), accessToken, currentTenant);
     sendEmailNotificationCallingMethod(rcGroupId, userControllerApi::sendNewMessageNotification);
@@ -51,18 +49,18 @@ public class EmailNotificationHelper {
 
   @Async
   public void sendEmailFeedbackNotificationViaUserService(
-      String rcGroupId, String accessToken,
-      Optional<Long> currentTenant) {
+      String rcGroupId, String accessToken, Optional<Long> currentTenant) {
     var userControllerApi = userServiceApiControllerFactory.createControllerApi();
     addDefaultHeaders(userControllerApi.getApiClient(), accessToken, currentTenant);
-    sendEmailNotificationCallingMethod(rcGroupId,
-        userControllerApi::sendNewFeedbackMessageNotification);
+    sendEmailNotificationCallingMethod(
+        rcGroupId, userControllerApi::sendNewFeedbackMessageNotification);
   }
 
-  private void sendEmailNotificationCallingMethod(String rcGroupId, Consumer<NewMessageNotificationDTO> newMessageNotificationConsumerMethod) {
+  private void sendEmailNotificationCallingMethod(
+      String rcGroupId, Consumer<NewMessageNotificationDTO> newMessageNotificationConsumerMethod) {
     try {
-      NewMessageNotificationDTO notificationDto = new NewMessageNotificationDTO().rcGroupId(
-          rcGroupId);
+      NewMessageNotificationDTO notificationDto =
+          new NewMessageNotificationDTO().rcGroupId(rcGroupId);
       newMessageNotificationConsumerMethod.accept(notificationDto);
       TenantContext.clear();
     } catch (RestClientException ex) {
@@ -70,10 +68,10 @@ public class EmailNotificationHelper {
     }
   }
 
-  private void addDefaultHeaders(ApiClient apiClient, String accessToken,
-      Optional<Long> currentTenant) {
-    HttpHeaders headers = this.serviceHelper.getKeycloakAndCsrfHttpHeaders(accessToken,
-        currentTenant);
+  private void addDefaultHeaders(
+      ApiClient apiClient, String accessToken, Optional<Long> currentTenant) {
+    HttpHeaders headers =
+        this.serviceHelper.getKeycloakAndCsrfHttpHeaders(accessToken, currentTenant);
     addTenantHeaderIfPresent(currentTenant, headers);
     headers.forEach((key, value) -> apiClient.addDefaultHeader(key, value.iterator().next()));
   }

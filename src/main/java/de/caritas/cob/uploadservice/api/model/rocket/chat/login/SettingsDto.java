@@ -9,5 +9,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class SettingsDto {
+
   private PreferencesDto preferences;
 }

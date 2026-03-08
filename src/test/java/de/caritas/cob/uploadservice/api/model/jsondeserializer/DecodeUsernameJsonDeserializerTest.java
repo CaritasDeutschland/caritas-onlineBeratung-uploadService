@@ -2,8 +2,8 @@ package de.caritas.cob.uploadservice.api.model.jsondeserializer;
 
 import static de.caritas.cob.uploadservice.helper.TestConstants.USERNAME_DECODED;
 import static de.caritas.cob.uploadservice.helper.TestConstants.USERNAME_ENCODED;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
@@ -13,20 +13,20 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.util.ClassUtils;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DecodeUsernameJsonDeserializerTest {
 
   private ObjectMapper objectMapper;
   private DecodeUsernameJsonDeserializer decodeUsernameJsonDeserializer;
   private UserHelper userHelper;
 
-  @Before
+  @BeforeEach
   public void setup() {
     userHelper = new UserHelper();
     objectMapper = new ObjectMapper();

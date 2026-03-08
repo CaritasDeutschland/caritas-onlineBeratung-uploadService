@@ -15,7 +15,7 @@ import de.caritas.cob.uploadservice.statisticsservice.generated.web.model.UserRo
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 public class JsonHelperTest {
@@ -35,8 +35,8 @@ public class JsonHelperTest {
             .timestamp(offsetDateTime);
 
     Optional<String> result =
-        JsonHelper.serializeWithOffsetDateTimeAsString(createMessageStatisticsEventMessage,
-            LogService::logStatisticsEventError);
+        JsonHelper.serializeWithOffsetDateTimeAsString(
+            createMessageStatisticsEventMessage, LogService::logStatisticsEventError);
 
     assertThat(result.isPresent(), is(true));
 
@@ -61,7 +61,6 @@ public class JsonHelperTest {
             + "}";
 
     assertThat(result.get(), jsonEquals(expectedJson));
-
   }
 
   @Test
@@ -72,10 +71,9 @@ public class JsonHelperTest {
     Mockito.when(om.writeValueAsString(Object.class)).thenThrow(new JsonProcessingException("") {});
 
     Optional<String> result =
-        JsonHelper.serializeWithOffsetDateTimeAsString(new Object(),
-            LogService::logInternalServerError);
+        JsonHelper.serializeWithOffsetDateTimeAsString(
+            new Object(), LogService::logInternalServerError);
 
     assertThat(result.isPresent(), is(false));
   }
-
 }

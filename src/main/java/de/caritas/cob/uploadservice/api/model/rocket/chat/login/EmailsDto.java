@@ -9,6 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class EmailsDto {
+
   private String address;
   private boolean verified;
 }

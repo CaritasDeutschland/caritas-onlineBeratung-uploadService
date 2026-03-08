@@ -54,20 +54,24 @@ public class UploadFacade {
    * <p>If the statistics function is enabled, the assignment of the enquired is processed as
    * statistical event.
    *
-   * @param rocketChatCredentials     {@link RocketChatCredentials} container
+   * @param rocketChatCredentials {@link RocketChatCredentials} container
    * @param rocketChatUploadParameter {@link RocketChatUploadParameter} container
    */
   public void uploadFileToRoom(
       RocketChatCredentials rocketChatCredentials,
       RocketChatUploadParameter rocketChatUploadParameter,
-      boolean sendNotification, String type, String fileHeader) {
+      boolean sendNotification,
+      String type,
+      String fileHeader) {
 
     this.uploadTrackingService.validateUploadLimit(rocketChatUploadParameter.getRoomId());
 
     sanitizeAndEncryptParametersAndUploadToRocketChatRoom(
         rocketChatCredentials, rocketChatUploadParameter, type, fileHeader);
-    this.liveEventNotificationService.sendLiveEvent(rocketChatUploadParameter.getRoomId(),
-        authenticatedUser.getAccessToken(), TenantContext.getCurrentTenantOption());
+    this.liveEventNotificationService.sendLiveEvent(
+        rocketChatUploadParameter.getRoomId(),
+        authenticatedUser.getAccessToken(),
+        TenantContext.getCurrentTenantOption());
     this.uploadTrackingService.trackUploadedFileForUser(rocketChatUploadParameter.getRoomId());
 
     if (sendNotification) {
@@ -92,20 +96,24 @@ public class UploadFacade {
    * Upload a file with a message to a Rocket.Chat feedback room. The message and the description
    * are encrypted before it is sent to Rocket.Chat.
    *
-   * @param rocketChatCredentials     {@link RocketChatCredentials} container
+   * @param rocketChatCredentials {@link RocketChatCredentials} container
    * @param rocketChatUploadParameter {@link RocketChatUploadParameter} container
    */
   public void uploadFileToFeedbackRoom(
       RocketChatCredentials rocketChatCredentials,
       RocketChatUploadParameter rocketChatUploadParameter,
-      boolean sendNotification, String type, String fileHeader) {
+      boolean sendNotification,
+      String type,
+      String fileHeader) {
 
     this.uploadTrackingService.validateUploadLimit(rocketChatUploadParameter.getRoomId());
 
     sanitizeAndEncryptParametersAndUploadToRocketChatRoom(
         rocketChatCredentials, rocketChatUploadParameter, type, fileHeader);
-    this.liveEventNotificationService.sendLiveEvent(rocketChatUploadParameter.getRoomId(),
-        authenticatedUser.getAccessToken(), TenantContext.getCurrentTenantOption());
+    this.liveEventNotificationService.sendLiveEvent(
+        rocketChatUploadParameter.getRoomId(),
+        authenticatedUser.getAccessToken(),
+        TenantContext.getCurrentTenantOption());
     this.uploadTrackingService.trackUploadedFileForUser(rocketChatUploadParameter.getRoomId());
 
     if (sendNotification) {
@@ -115,7 +123,9 @@ public class UploadFacade {
 
   private void sanitizeAndEncryptParametersAndUploadToRocketChatRoom(
       RocketChatCredentials rocketChatCredentials,
-      RocketChatUploadParameter rocketChatUploadParameter, String type, String fileHeader) {
+      RocketChatUploadParameter rocketChatUploadParameter,
+      String type,
+      String fileHeader) {
 
     rocketChatUploadParameterSanitizer.sanitize(rocketChatUploadParameter);
 
@@ -140,11 +150,12 @@ public class UploadFacade {
       throw new InternalServerErrorException(e, LogService::logEncryptionServiceError);
     }
 
-    FullUploadResponseDto uploadResponse = rocketChatService.roomsUpload(rocketChatCredentials,
-        encryptedRocketChatUploadParameter);
+    FullUploadResponseDto uploadResponse =
+        rocketChatService.roomsUpload(rocketChatCredentials, encryptedRocketChatUploadParameter);
 
     if (doAttachmentE2e) {
-      if (uploadResponse.getMessage() == null || !StringUtils.hasText(uploadResponse.getMessage().getId())) {
+      if (uploadResponse.getMessage() == null
+          || !StringUtils.hasText(uploadResponse.getMessage().getId())) {
         throw new InternalServerErrorException(
             new Exception("Upload response message payload or id was empty!"),
             LogService::logInternalServerError);

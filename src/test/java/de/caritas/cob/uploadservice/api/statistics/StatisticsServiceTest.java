@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.powermock.reflect.Whitebox.setInternalState;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 import de.caritas.cob.uploadservice.api.service.LogService;
@@ -13,19 +12,20 @@ import de.caritas.cob.uploadservice.api.statistics.event.CreateMessageStatistics
 import de.caritas.cob.uploadservice.statisticsservice.generated.web.model.EventType;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageProperties;
+import org.springframework.test.util.ReflectionTestUtils;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class StatisticsServiceTest {
 
   private static final String FIELD_NAME_STATISTICS_ENABLED = "statisticsEnabled";
@@ -38,13 +38,14 @@ public class StatisticsServiceTest {
   @InjectMocks private StatisticsService statisticsService;
   @Mock private AmqpTemplate amqpTemplate;
 
-  @Before
+  @BeforeEach
   public void setup() {
     createMessageStatisticsEvent = Mockito.mock(CreateMessageStatisticsEvent.class);
     when(createMessageStatisticsEvent.getEventType()).thenReturn(eventType);
     when(createMessageStatisticsEvent.getPayload()).thenReturn(Optional.of(PAYLOAD));
-    setInternalState(LogService.class, "LOGGER", logger);
-    setField(statisticsService, FIELD_NAME_RABBIT_EXCHANGE_NAME, RABBIT_EXCHANGE_NAME);
+    ReflectionTestUtils.setField(
+        statisticsService, FIELD_NAME_RABBIT_EXCHANGE_NAME, RABBIT_EXCHANGE_NAME);
+    ReflectionTestUtils.setField(LogService.class, "LOGGER", logger);
   }
 
   @Test

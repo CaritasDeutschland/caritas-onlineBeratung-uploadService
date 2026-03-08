@@ -2,8 +2,8 @@ package de.caritas.cob.uploadservice.api.statistics;
 
 import de.caritas.cob.uploadservice.api.service.LogService;
 import de.caritas.cob.uploadservice.api.statistics.event.StatisticsEvent;
+import jakarta.validation.constraints.NotNull;
 import java.nio.charset.StandardCharsets;
-import javax.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.MessageBuilder;
@@ -46,9 +46,8 @@ public class StatisticsService {
                           .build()),
               () ->
                   LogService.logStatisticsEventWarning(
-                      String.format(
-                          "Empty statistics event message payload for type %s received",
-                          statisticsEvent.getClass().getSimpleName())));
+                      "Empty statistics event message payload for type %s received"
+                          .formatted(statisticsEvent.getClass().getSimpleName())));
     }
   }
 }

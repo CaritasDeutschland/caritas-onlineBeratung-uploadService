@@ -31,7 +31,8 @@ public class Helper {
     try {
       text = Jsoup.clean(text, StringUtils.EMPTY, Whitelist.none(), outputSettings);
     } catch (Exception exception) {
-      throw new InternalServerErrorException("Error while removing HTML from text", exception, LogService::logInternalServerError);
+      throw new InternalServerErrorException(
+          "Error while removing HTML from text", exception, LogService::logInternalServerError);
     }
     return text;
   }

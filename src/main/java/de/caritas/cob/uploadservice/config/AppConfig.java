@@ -8,17 +8,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.client.RestTemplate;
 
-/**
- * Contains some general spring boot application configurations
- *
- */
+/** Contains some general spring boot application configurations */
 @Configuration
 @ComponentScan(basePackages = {"de.caritas.cob.uploadservice"})
 public class AppConfig {
 
   /**
    * Activate the messages.properties for validation messages.
-   * 
+   *
    * @param messageSource
    * @return
    */

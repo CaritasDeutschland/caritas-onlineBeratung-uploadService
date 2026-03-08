@@ -1,8 +1,10 @@
 package de.caritas.cob.uploadservice.api.exception;
 
+import java.io.Serial;
+
 public class NoMasterKeyException extends Exception {
 
-  private static final long serialVersionUID = 362702101121444833L;
+  @Serial private static final long serialVersionUID = 362702101121444833L;
 
   /**
    * Exception, when no master-key is set
@@ -12,5 +14,4 @@ public class NoMasterKeyException extends Exception {
   public NoMasterKeyException(String message) {
     super(message);
   }
-
 }
