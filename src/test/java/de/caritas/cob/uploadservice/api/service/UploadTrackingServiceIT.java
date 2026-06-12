@@ -15,6 +15,7 @@ import de.caritas.cob.uploadservice.api.exception.httpresponses.QuotaReachedExce
 import de.caritas.cob.uploadservice.api.helper.AuthenticatedUser;
 import de.caritas.cob.uploadservice.api.model.UploadByUser;
 import de.caritas.cob.uploadservice.api.repository.UploadByUserRepository;
+import java.util.Collections;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,6 +51,7 @@ public class UploadTrackingServiceIT {
   @Before
   public void setup() {
     when(this.authenticatedUser.getUserId()).thenReturn("userId");
+    when(this.authenticatedUser.getRoles()).thenReturn(Collections.emptySet());
     setInternalState(LogService.class, "LOGGER", logger);
   }
 
