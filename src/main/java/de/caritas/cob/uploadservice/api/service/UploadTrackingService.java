@@ -2,6 +2,7 @@ package de.caritas.cob.uploadservice.api.service;
 
 import de.caritas.cob.uploadservice.api.exception.httpresponses.QuotaReachedException;
 import de.caritas.cob.uploadservice.api.helper.AuthenticatedUser;
+import de.caritas.cob.uploadservice.api.helper.AuthenticatedUserHelper;
 import de.caritas.cob.uploadservice.api.model.UploadByUser;
 import de.caritas.cob.uploadservice.api.repository.UploadByUserRepository;
 import java.time.LocalDateTime;
@@ -21,12 +22,15 @@ public class UploadTrackingService {
   @Value("${upload.file.perday.limit}")
   private int uploadLimit;
 
+  @Value("${upload.file.perday.limit.consultant}")
+  private int uploadLimitConsultant;
+
   private final @NonNull UploadByUserRepository uploadByUserRepository;
   private final @NonNull AuthenticatedUser authenticatedUser;
 
   /**
    * Validates the upload limit of files for given user and throws a {@link QuotaReachedException}
-   * if limit for day is reached.
+   * if limit for day is reached. Consultants and advice seekers have separate daily limits.
    *
    * @param sessionId the id for the current session
    */
@@ -34,9 +38,15 @@ public class UploadTrackingService {
     String userId = this.authenticatedUser.getUserId();
     Integer uploadCount = this.uploadByUserRepository
         .countAllByUserIdAndSessionId(userId, sessionId);
-    if (uploadCount >= this.uploadLimit) {
+    if (uploadCount >= resolveUploadLimit()) {
       throw new QuotaReachedException(LogService::logInfo);
     }
+  }
+
+  private int resolveUploadLimit() {
+    return AuthenticatedUserHelper.isConsultant(this.authenticatedUser)
+        ? this.uploadLimitConsultant
+        : this.uploadLimit;
   }
 
   /**
